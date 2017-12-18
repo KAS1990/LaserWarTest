@@ -1,0 +1,102 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    
+	<!-- Цвета шрифтов -->
+	<!-- Заголовки панелей -->
+	<SolidColorBrush x:Key="TitleTextBrush" Color="Black"/>
+	<!-- Заголовки столбцов и названия полей ввода -->
+	<SolidColorBrush x:Key="SubtitleTextBrush" Color="#FF292929"/>
+	<!-- Цвет текста в полях ввода -->
+	<SolidColorBrush x:Key="TextboxForegroundBrush" Color="#FF292929"/>
+	
+	<!-- Цвет текста на кнопках в разблокированном состоянии -->
+	<SolidColorBrush x:Key="ButtonEnabledForegroundBrush" Color="White"/>
+	<!-- Цвет текста на кнопках, когда они находятся в фокусе -->
+	<SolidColorBrush x:Key="ButtonFocusedForegroundBrush" Color="White"/>
+	<!-- Цвет текста на кнопках, когда они находятся выключенном состоянии -->
+	<SolidColorBrush x:Key="ButtonDisabledForegroundBrush" Color="Black"/>
+	
+	<!-- Ещё 1 цвет текста на кнопках в разблокированном состоянии -->
+	<SolidColorBrush x:Key="ButtonEnabledForegroundBrush1" Color="#FF005AFF"/>
+	<!-- Ещё 1 цвет текста на кнопках, когда они находятся в фокусе -->
+	<SolidColorBrush x:Key="ButtonFocusedForegroundBrush1" Color="Black"/>
+	<!-- Ещё 1 цвет текста на кнопках, когда они находятся выключенном состоянии -->
+	<SolidColorBrush x:Key="ButtonDisabledForegroundBrush1" Color="Black"/>
+		
+	
+	<!-- Фон -->
+	<SolidColorBrush x:Key="PanelBackgroundBrush" Color="White"/>
+	<SolidColorBrush x:Key="MessageBackgroundBrush" Color="White"/>
+	<SolidColorBrush x:Key="ShadowScreenBackgroundBrush" Color="Black"/>
+	<SolidColorBrush x:Key="TextboxBackgroundBrush" Color="Transparent"/>
+	<SolidColorBrush x:Key="TablesBackgroundBrush" Color="Transparent"/>
+
+	<SolidColorBrush x:Key="LeftPanelBackgroundBrush" Color="Black"/>
+	<SolidColorBrush x:Key="TabItemSelectedBackgroundBrush" Color="#FF005AFF"/>
+	<SolidColorBrush x:Key="TabItemFocusedBackgroundBrush" Color="CadetBlue"/>
+
+	<SolidColorBrush x:Key="ButtonEnabledBackgroundBrush" Color="#FF005AFF"/>
+	<SolidColorBrush x:Key="ButtonFocusedBackgroundBrush" Color="#FF005AFF"/>
+	<SolidColorBrush x:Key="ButtonDisabledBackgroundBrush" Color="Gray"/>
+
+	<SolidColorBrush x:Key="ButtonEnabledBackgroundBrush1" Color="White"/>
+	<SolidColorBrush x:Key="ButtonFocusedBackgroundBrush1" Color="White"/>
+	<SolidColorBrush x:Key="ButtonDisabledBackgroundBrush1" Color="Gray"/>
+
+
+	<!-- Дополнительные цвета -->
+	<SolidColorBrush x:Key="ProgressBarBrush" Color="#FF005AFF"/>
+	<SolidColorBrush x:Key="TextboxEnabledBorderBrush" Color="#FF005AFF"/>
+	<SolidColorBrush x:Key="RowBordersBrush" Color="#FFFDFDFD"/>
+	<SolidColorBrush x:Key="WaitingCircleBrush" Color="White"/>
+	<SolidColorBrush x:Key="ButtonBorderBrush1" Color="#FF005AFF"/>
+	<SolidColorBrush x:Key="ScrollbarBackgroundBrush" Color="White"/>
+	<SolidColorBrush x:Key="ThumbBackgroundBrush" Color="Black"/>
+	
+	
+	<!-- Шрифты -->
+	<FontFamily x:Key="MainFont">Arial</FontFamily>
+	<FontFamily x:Key="TextFont">TimesNewRoman</FontFamily>
+	
+	<sys:Double x:Key="TitleFontSize">40</sys:Double>
+	<sys:Double x:Key="SubtitleFontSize">14</sys:Double>
+	<sys:Double x:Key="TextboxFontSize">14</sys:Double>
+	<sys:Double x:Key="ButtonFontSize">14</sys:Double>
+	<sys:Double x:Key="ButtonFocusedFontSize">18</sys:Double>
+	<sys:Double x:Key="SmallFontSize">12</sys:Double>
+	
+	<FontWeight x:Key="TitleFontWeight">Bold</FontWeight>
+	<FontWeight x:Key="SubtitleFontWeight">Bold</FontWeight>
+	<FontWeight x:Key="ButtonFontWeight">Bold</FontWeight>
+	<FontWeight x:Key="ButtonFocusedFontWeight">Bold</FontWeight>
+	
+	
+	<!-- Затемнение при длительном ожидании и отображении диалогового окна -->
+	<sys:Double x:Key="ShadowScreenOpacity">0.7</sys:Double>
+	<sys:Double x:Key="StandartOpacity">0.8</sys:Double>
+	
+	
+	<!-- Отступы -->
+	<Thickness x:Key="PanelMargin">20,20,20,20</Thickness>
+	<Thickness x:Key="TitleMargin">0,0,0,40</Thickness>
+	<Thickness x:Key="SubtitleFMargin">0,0,0,2</Thickness>
+	<Thickness x:Key="RowTitleMargin">0,0,0,5</Thickness>
+	<Thickness x:Key="RowFieldMargin">0,20,0,1</Thickness>
+	<Thickness x:Key="ButtonMargin">10,0,10,0</Thickness>
+	<Thickness x:Key="TextboxPadding">0,1,3,0</Thickness>
+	<Thickness x:Key="LabelPadding">0</Thickness>
+	<Thickness x:Key="ButtonPadding">0</Thickness>
+	
+	
+	<!-- Выравнивание -->
+	<HorizontalAlignment x:Key="TitleHorizontalContentAlignment">Left</HorizontalAlignment>
+	<HorizontalAlignment x:Key="SubtitleHorizontalContentAlignment">Left</HorizontalAlignment>
+	<HorizontalAlignment x:Key="TextboxHorizontalContentAlignment">Left</HorizontalAlignment>
+	<TextAlignment x:Key="TextBlockTextAlignment">Left</TextAlignment>
+	<HorizontalAlignment x:Key="ButtonHorizontalContentAlignment">Center</HorizontalAlignment>
+	<VerticalAlignment x:Key="ButtonVerticalContentAlignment">Center</VerticalAlignment>
+	
+	
+	<Thickness x:Key="TextBoxBorderThickness">0,0,0,1</Thickness>
+</ResourceDictionary>
