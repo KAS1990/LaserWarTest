@@ -15,9 +15,24 @@ namespace LaserWar.Models
 	public class SoundModel
 	{
 		readonly SoundsModel m_Parent = null;
-		public event EventHandler<SoundModelEventArgs> SoundUpdated = delegate { };
-		
 
+		#region SoundUpdated event
+		public event EventHandler<SoundModelEventArgs> SoundUpdated = delegate { };
+		public void OnSoundUpdated(string[] changedProperties)
+		{
+			if (SoundUpdated != null)
+				SoundUpdated(this, new SoundModelEventArgs(changedProperties));
+		}
+
+
+		public void OnSoundUpdated(string propertyName)
+		{
+			if (SoundUpdated != null)
+				SoundUpdated(this, new SoundModelEventArgs(propertyName));
+		}
+		#endregion
+
+		
 		WebClient m_FileDowloader = new WebClient();
 				
 
@@ -159,9 +174,11 @@ namespace LaserWar.Models
 
 		public SoundModel(int SoundId, SoundsModel Parent)
 		{
+			m_Parent = Parent;
+
 			m_SoundId = SoundId;
 			Sound = GetSound();
-			m_Parent = Parent;
+			Sound.PropertyChanged += (s, e) => { OnSoundUpdated(e.PropertyName); };
 
 			m_FileDowloader.DownloadFileCompleted += FileDowloader_DownloadAsyncCompleted;
 			m_FileDowloader.DownloadProgressChanged += FileDowloader_DownloadProgressChanged;
@@ -171,7 +188,10 @@ namespace LaserWar.Models
 		public SoundModel(sound sound, SoundsModel Parent)
 		{
 			m_SoundId = sound.id_sound;
+			
 			Sound = sound;
+			Sound.PropertyChanged += (s, e) => { OnSoundUpdated(e.PropertyName); };
+
 			m_Parent = Parent;
 
 			m_FileDowloader.DownloadFileCompleted += FileDowloader_DownloadAsyncCompleted;
@@ -280,20 +300,5 @@ namespace LaserWar.Models
 			}
 		}
 		#endregion
-
-
-
-		public void OnSoundUpdated(string[] changedProperties)
-		{
-			if (SoundUpdated != null)
-				SoundUpdated(this, new SoundModelEventArgs(changedProperties));
-		}
-
-
-		public void OnSoundUpdated(string propertyName)
-		{
-			if (SoundUpdated != null)
-				SoundUpdated(this, new SoundModelEventArgs(propertyName));
-		}
 	}
 }

@@ -103,11 +103,11 @@ namespace LaserWar.ViewModels
 
 
 		#region DownloadCommand
-		private readonly ICommand m_DownloadCommand;
+		private readonly RelayCommand m_DownloadCommand;
 		/// <summary>
 		/// Команда загрузки задания на ПК
 		/// </summary>
-		public ICommand DownloadCommand
+		public RelayCommand DownloadCommand
 		{
 			get { return m_DownloadCommand; }
 		}
@@ -123,15 +123,26 @@ namespace LaserWar.ViewModels
 
 			m_model.DownloadStarted += (s, e) => { OnDownloadStarted(e); };
 			m_model.DownloadComleted += (s, e) => { OnDownloadComleted(e); };
-			
-			m_DownloadCommand = new DownloadCommand(this);
-			m_DownloadCommand.CanExecuteChanged += (s, e) => { OnPropertyChanged(InDataDownloadingPropertyName); };
+
+			m_DownloadCommand = new RelayCommand(arg => m_model.Download(), arg => m_model.CanDownload);
+			m_DownloadCommand.CanExecuteChanged += (s, e) =>
+			{
+				OnPropertyChanged(InDataDownloadingPropertyName);
+			};
 		}
 
 
 		public void Download()
 		{
 			m_model.Download();
+		}
+
+
+		protected override void OnPropertyChanged(string info)
+		{
+			if (info == CanDownloadPropertyName)
+				m_DownloadCommand.RaiseCanExecuteChanged();
+			base.OnPropertyChanged(info);
 		}
 	}
 }

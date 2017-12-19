@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="LaserWar.ExtraControls.ProgressShape"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center">
+   
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="..\Templates\CommonResources.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</UserControl.Resources>
+	
+	<!-- Эллипс, который будет вращаться -->
+	<Ellipse Height="50"
+			 Width="50"
+			 RenderTransformOrigin="0.5,0.5"
+			 Stretch="Uniform"
+			 Fill="Transparent"
+			 Stroke="{StaticResource ProgressCircleBackgroundBrush}"
+			 StrokeThickness="3"
+			 StrokeDashArray="30 11">
+		<Ellipse.RenderTransform>
+			<RotateTransform Angle="0" />
+		</Ellipse.RenderTransform>
+		
+		<Ellipse.Resources>
+			<Style TargetType="Ellipse">
+				<Style.Triggers>
+					<!-- Бесконечная анимация, которая начинается при отображении контрола -->
+					<Trigger Property="IsVisible" Value="true">
+						<Trigger.EnterActions>
+							<BeginStoryboard>
+								<Storyboard RepeatBehavior="Forever">
+									<DoubleAnimation Storyboard.TargetProperty="RenderTransform.Angle"
+													 From="0"
+													 To="359"
+													 Duration="0:0:0.5"/>
+								</Storyboard>
+							</BeginStoryboard>
+						</Trigger.EnterActions>
+					</Trigger>
+				</Style.Triggers>
+			</Style>
+		</Ellipse.Resources>
+    </Ellipse>
+</UserControl>

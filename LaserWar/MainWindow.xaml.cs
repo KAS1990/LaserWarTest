@@ -32,6 +32,8 @@ using LaserWar.Models;
 using LaserWar.Veiws;
 using LaserWar.ViewModels;
 using LaserWar.Stuff;
+using LaserWar.ExtraControls.DialogWnds;
+using LaserWar.ExtraControls;
 
 
 namespace LaserWar
@@ -58,11 +60,41 @@ namespace LaserWar
 				if (m_ShowShadow != value)
 				{
 					m_ShowShadow = value;
+					if (!m_ShowShadow)
+					{
+						ShowProgressShape = false;
+						brdShadow.Child = null; // Если убрали затемнение, то никакие эдементы на нём нам больше не нужны
+					}
 					OnPropertyChanged(ShowShadowPropertyName);
 				}
 			}
 		}
 		#endregion
+
+		
+		#region ShowProgressShape
+		private static readonly string ShowProgressShapePropertyName = GlobalDefines.GetPropertyName<MainWindow>(m => m.ShowProgressShape);
+
+		private bool m_ShowProgressShape = false;
+
+		public bool ShowProgressShape
+		{
+			get { return m_ShowProgressShape; }
+			set
+			{
+				if (m_ShowProgressShape != value)
+				{
+					m_ShowProgressShape = value;
+					if (m_ShowProgressShape)
+						brdShadow.Child = new ProgressShape();
+					else
+						brdShadow.Child = null;
+					OnPropertyChanged(ShowProgressShapePropertyName);
+				}
+			}
+		}
+		#endregion
+				
 				
 		
 		public MainWindow()
@@ -106,7 +138,7 @@ namespace LaserWar
 		
 		void DataDownloader_DownloadStarted(object sender, EventArgs e)
 		{
-			ShowShadow = true;
+			ShowShadow = ShowProgressShape = true;
 		}
 
 
@@ -124,19 +156,22 @@ namespace LaserWar
 				LaserWar.Properties.Settings.Default.TaskJSONText = m_DataDownloader.JSONText;
 
 				LaserWar.Properties.Settings.Default.Save();
+
+				ShowShadow = false;
 			}
 			else
-			{	// Не удалось загрузить файл
-				MessageWnd wnd = new MessageWnd()
+			{	// Не удалось загрузить файл => показываем окно сообщения
+				MessageDialog dlg = new MessageDialog(brdShadow)
 				{
-					Owner = this,
 					Title = Properties.Resources.resErrorOccured,
 					Message = string.Format(Properties.Resources.resfmtCantDownloadFile, e.SourceFileName)
 				};
-				wnd.ShowDialog();
+				dlg.ButtonClicked += (s, ev) => 
+					{
+						(s as MessageDialog).RemoveFromHost();
+						ShowShadow = false;
+					};
 			}
-			
-			ShowShadow = false;
 		}
 
 

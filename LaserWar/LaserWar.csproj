@@ -127,7 +127,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Commands\DownloadCommand.cs" />
+    <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="ExtraControls\DialogWnds\ButtonClickedEventArgs.cs" />
+    <Compile Include="ExtraControls\DialogWnds\DialogWndBase.cs" />
+    <Compile Include="ExtraControls\DialogWnds\Enums.cs" />
+    <Compile Include="ExtraControls\DialogWnds\MessageDialog.xaml.cs">
+      <DependentUpon>MessageDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExtraControls\ProgressShape.xaml.cs">
+      <DependentUpon>ProgressShape.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Global\AppAttributes.cs" />
     <Compile Include="Global\CNotifyPropertyChangedUserCtrl.cs" />
     <Compile Include="Global\CNotifyPropertyChangedWnd.cs" />
@@ -138,15 +147,22 @@
     <Compile Include="Models\SoundsModel.cs" />
     <Compile Include="Stuff\DataDownloadComletedEventArgs.cs" />
     <Compile Include="Stuff\EntitiesContextEventArgs.cs" />
-    <Compile Include="Stuff\MessageWnd.xaml.cs">
-      <DependentUpon>MessageWnd.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Stuff\SoundModelEventArgs.cs" />
     <Compile Include="Stuff\TaskJSONObject.cs" />
     <Compile Include="Veiws\DataDownloaderView.xaml.cs">
       <DependentUpon>DataDownloaderView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\DataDownloaderViewModel.cs" />
+    <Compile Include="ViewModels\SoundsViewModel.cs" />
+    <Compile Include="ViewModels\SoundViewModel.cs" />
+    <Page Include="ExtraControls\DialogWnds\MessageDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ExtraControls\ProgressShape.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -164,10 +180,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Stuff\MessageWnd.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Templates\CommonControlsTemplates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

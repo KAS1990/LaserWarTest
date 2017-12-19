@@ -62,7 +62,17 @@ namespace LaserWar.Models
 
 		public Uri TaskUri
 		{
-			get { return new Uri(m_TaskUrl); }
+			get
+			{
+				try
+				{
+					return new Uri(m_TaskUrl);
+				}
+				catch
+				{
+					return null;
+				}
+			}
 		}
 		#endregion
 
@@ -136,13 +146,20 @@ namespace LaserWar.Models
 				return;
 
 			JSONText = "";
-			
-			m_wc = new WebClient();
-			m_wc.DownloadStringCompleted += wc_DownloadStringCompleted;
 
-			m_wc.DownloadStringAsync(TaskUri);
-
+			// Это событие по любому должно вызваться, чтобы вызывающий объект смог понять, что отправка данных началась,
+			// но, возможно, быстро закончилась
 			OnDownloadStarted();
+						
+			if (TaskUri == null)
+				OnDownloadComleted(new DataDownloadComletedEventArgs(new ArgumentException("Invalid URL"), TaskUrl));
+			else
+			{
+				m_wc = new WebClient();
+				m_wc.DownloadStringCompleted += wc_DownloadStringCompleted;
+
+				m_wc.DownloadStringAsync(TaskUri);
+			}
 		}
 
 		/// <summary>
@@ -162,7 +179,7 @@ namespace LaserWar.Models
 					// Пишем объект в БД, предварительно очистив её
 					for (int i = 0; i < m_DBContext.sounds.Local.Count; i++)
 						m_DBContext.Entry(m_DBContext.sounds.Local[i]).State = EntityState.Deleted;
-					m_DBContext.SaveChanges();
+					m_DBContext.SaveChanges(false);
 
 					foreach (sound jsonSound in LoadedObject.sounds)
 						m_DBContext.sounds.Add(jsonSound);

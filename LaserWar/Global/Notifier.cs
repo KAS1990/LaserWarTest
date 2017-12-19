@@ -10,7 +10,7 @@ namespace LaserWar.Global
 	{
 		public event PropertyChangedEventHandler PropertyChanged;
 		
-		protected void OnPropertyChanged(string info)
+		protected virtual void OnPropertyChanged(string info)
 		{
 			if (PropertyChanged != null)
 				PropertyChanged(this, new PropertyChangedEventArgs(info));

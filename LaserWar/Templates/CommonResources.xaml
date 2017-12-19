@@ -2,6 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 					xmlns:sys="clr-namespace:System;assembly=mscorlib">
     
+	<!-- Затемнение при длительном ожидании и отображении диалогового окна -->
+	<sys:Double x:Key="ShadowScreenOpacity">0.7</sys:Double>
+	<sys:Double x:Key="StandartOpacity">0.8</sys:Double>
+	
 	<!-- Цвета шрифтов -->
 	<!-- Заголовки панелей -->
 	<SolidColorBrush x:Key="TitleTextBrush" Color="Black"/>
@@ -28,7 +32,8 @@
 	<!-- Фон -->
 	<SolidColorBrush x:Key="PanelBackgroundBrush" Color="White"/>
 	<SolidColorBrush x:Key="MessageBackgroundBrush" Color="White"/>
-	<SolidColorBrush x:Key="ShadowScreenBackgroundBrush" Color="Black"/>
+	<SolidColorBrush x:Key="ProgressCircleBackgroundBrush" Color="White"/>
+	<SolidColorBrush x:Key="ShadowScreenBackgroundBrush" Color="Black" Opacity="{StaticResource ShadowScreenOpacity}"/>
 	<SolidColorBrush x:Key="TextboxBackgroundBrush" Color="Transparent"/>
 	<SolidColorBrush x:Key="TablesBackgroundBrush" Color="Transparent"/>
 
@@ -70,11 +75,6 @@
 	<FontWeight x:Key="SubtitleFontWeight">Bold</FontWeight>
 	<FontWeight x:Key="ButtonFontWeight">Bold</FontWeight>
 	<FontWeight x:Key="ButtonFocusedFontWeight">Bold</FontWeight>
-	
-	
-	<!-- Затемнение при длительном ожидании и отображении диалогового окна -->
-	<sys:Double x:Key="ShadowScreenOpacity">0.7</sys:Double>
-	<sys:Double x:Key="StandartOpacity">0.8</sys:Double>
 	
 	
 	<!-- Отступы -->

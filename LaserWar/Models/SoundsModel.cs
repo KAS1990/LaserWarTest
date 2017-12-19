@@ -8,10 +8,11 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Collections.ObjectModel;
 using LaserWar.Stuff;
+using System.Collections.Specialized;
 
 namespace LaserWar.Models
 {
-	public class SoundsModel
+	public class SoundsModel : Notifier
 	{
 		readonly EntitiesContext m_DBContext = null;
 		public EntitiesContext DBContext
@@ -43,13 +44,21 @@ namespace LaserWar.Models
 		SoundModel m_PlayingSound = null;
 		public SoundModel PlayingSound
 		{
-			private set { m_PlayingSound = value; }
 			get { return m_PlayingSound; }
+			private set
+			{
+				if (m_PlayingSound != value)
+				{
+					m_PlayingSound = value;
+					OnPropertyChanged(PlayingSoundPropertyName);
+					OnPropertyChanged(IsPlayingPropertyName);
+					OnPropertyChanged(CanPlayPropertyName);
+				}
+			}
 		}
 		#endregion
 
-
-		
+				
 		#region IsPlaying
 		private static readonly string IsPlayingPropertyName = GlobalDefines.GetPropertyName<SoundsModel>(m => m.IsPlaying);
 
@@ -78,7 +87,10 @@ namespace LaserWar.Models
 		{
 			m_DBContext = dbContext;
 
+			m_DBContext.ChangesSavedToDB += (s, e) => { ReloadSounds(); };
+
 			Sounds = new ReadOnlyObservableCollection<SoundModel>(m_Sounds);
+			(Sounds as INotifyCollectionChanged).CollectionChanged += Sounds_CollectionChanged;
 			
 			ReloadSounds();
 
@@ -110,6 +122,12 @@ namespace LaserWar.Models
 			}
 
 			m_Sounds.Clear();
+		}
+
+
+		void Sounds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+		{
+			OnPropertyChanged(CanPlayPropertyName);
 		}
 
 

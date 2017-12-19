@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:glob="clr-namespace:LaserWar.Global"
 		xmlns:gconvs="clr-namespace:LaserWar.Global.Converters"
+		xmlns:exctrls="clr-namespace:LaserWar.ExtraControls"
         Title="{Loc resMainWndTitle}"
 		SizeToContent="WidthAndHeight"
 		ResizeMode="CanResize"
@@ -105,10 +106,8 @@
 		</TabControl>
 		
 		<!-- Затемнение окна -->
-		<Border Background="{StaticResource ShadowScreenBackgroundBrush}"
-				Opacity="{StaticResource ShadowScreenOpacity}"
-				Visibility="{Binding ShowShadow, Converter={gconvs:BoolToVisibilityMarkupConverter UnvisibleValue=Hidden}}" >
-			<!-- TO DO: додедать вращающийся круг -->
-		</Border>
+		<Border Name="brdShadow"
+				Background="{StaticResource ShadowScreenBackgroundBrush}"
+				Visibility="{Binding ShowShadow, Converter={gconvs:BoolToVisibilityMarkupConverter UnvisibleValue=Hidden}}" />
 	</Grid>
 </glob:CNotifyPropertyChangedWnd>
