@@ -5,6 +5,7 @@ using System.Text;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace LaserWar.Global
 {
@@ -57,6 +58,89 @@ namespace LaserWar.Global
 				return ((MemberExpression)convertExpression.Operand).Member.Name;
 
 			return ((MemberExpression)property.Body).Member.Name;
+		}
+
+
+		/// <summary>
+		/// Функция масштабирует <paramref name="tbctrl"/> таким  образом, чтобы он имел
+		/// высоту и ширину, равные высоте и ширине одной из вкладок.
+		/// Для ширины и высоты могут быть заданы разные вкладки.
+		/// </summary>
+		/// <param name="tbctrl">
+		/// Набор вкладок. Вкладки должны содержать в свойстве Content элемент типа CSettingsTabBase.
+		/// </param>
+		/// <param name="WidthPatternTab">
+		/// Вкладка, по которой устанавливается ширина всех остальных. Если null, то выбирается ширины максимально широкой вкладки
+		/// </param>
+		/// <param name="HeightPatternTab">
+		/// Вкладка, по которой устанавливается высота всех остальных. Если null, то выбирается высота максимально высокой вкладки
+		/// </param>
+		public static void AutoscaleTabs(TabControl tbctrl, FrameworkElement WidthPatternTab, FrameworkElement HeightPatternTab)
+		{
+			double MaxWidth = 0, MaxHeight = 0;
+
+			if (WidthPatternTab == null && HeightPatternTab == null)
+			{
+				for (int tabIndex = 0; tabIndex < tbctrl.Items.Count; tabIndex++)
+				{
+					if ((tbctrl.Items[tabIndex] as TabItem).Content != null)
+					{
+						((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).Measure(GlobalDefines.STD_SIZE_FOR_MEASURE);
+						if (MaxWidth < ((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).DesiredSize.Width)
+							MaxWidth = ((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).DesiredSize.Width;
+						if (MaxHeight < ((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).DesiredSize.Height)
+							MaxHeight = ((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).DesiredSize.Height;
+					}
+				}
+			}
+			else
+				if (WidthPatternTab == null)
+				{	/* HeightPatternTab != null => определяем ширину как максимум из всех, а высоту - высоту вкладки HeightPatternTab */
+					HeightPatternTab.Measure(GlobalDefines.STD_SIZE_FOR_MEASURE);
+					MaxHeight = HeightPatternTab.DesiredSize.Height;
+					for (int tabIndex = 0; tabIndex < tbctrl.Items.Count; tabIndex++)
+					{
+						if ((tbctrl.Items[tabIndex] as TabItem).Content != null)
+						{
+							((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).Measure(GlobalDefines.STD_SIZE_FOR_MEASURE);
+							if (MaxWidth < ((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).DesiredSize.Width)
+								MaxWidth = ((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).DesiredSize.Width;
+						}
+					}
+				}
+				else
+					if (HeightPatternTab == null)
+					{	/* WidthPatternTab != null => определяем высоту как максимум из всех, а ширину - ширину вкладки HeightPatternTab */
+						WidthPatternTab.Measure(GlobalDefines.STD_SIZE_FOR_MEASURE);
+						MaxWidth = WidthPatternTab.DesiredSize.Height;
+						for (int tabIndex = 0; tabIndex < tbctrl.Items.Count; tabIndex++)
+						{
+							if ((tbctrl.Items[tabIndex] as TabItem).Content != null)
+							{
+								((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).Measure(GlobalDefines.STD_SIZE_FOR_MEASURE);
+								if (MaxHeight < ((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).DesiredSize.Height)
+									MaxHeight = ((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).DesiredSize.Height;
+							}
+						}
+					}
+					else
+					{	/* (WidthPatternTab != null && HeightPatternTab != null) */
+						HeightPatternTab.Measure(GlobalDefines.STD_SIZE_FOR_MEASURE);
+						MaxHeight = HeightPatternTab.DesiredSize.Height;
+						if (HeightPatternTab != WidthPatternTab)
+							WidthPatternTab.Measure(GlobalDefines.STD_SIZE_FOR_MEASURE);
+						MaxWidth = WidthPatternTab.DesiredSize.Width;
+					}
+
+			if (!((MaxWidth < double.MinValue) || (MaxHeight < double.MinValue)))// если измерения были произведены
+				for (int tabIndex = 0; tabIndex < tbctrl.Items.Count; tabIndex++)
+				{
+					if ((tbctrl.Items[tabIndex] as TabItem).Content != null)
+					{
+						((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).Width = MaxWidth;
+						((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).Height = MaxHeight;
+					}
+				}
 		}
 	}
 }

@@ -61,6 +61,15 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to B.
+        /// </summary>
+        internal static string resB {
+            get {
+                return ResourceManager.GetString("resB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Закрыть.
         /// </summary>
         internal static string resClose {
@@ -106,6 +115,24 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Имя файла.
+        /// </summary>
+        internal static string resFileName {
+            get {
+                return ResourceManager.GetString("resFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Размер файла.
+        /// </summary>
+        internal static string resFileSize {
+            get {
+                return ResourceManager.GetString("resFileSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to В ходе работы программы {0} произошла критическая ошибка &quot;{1}&quot;, приложение будет закрыто. Было создано 2 файла отчета об ошибке {2} и {3}..
         /// </summary>
         internal static string resfmtAppCrashedWithStackTrace {
@@ -134,6 +161,24 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to KB.
+        /// </summary>
+        internal static string resKB {
+            get {
+                return ResourceManager.GetString("resKB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Загрузка файла.
+        /// </summary>
+        internal static string resLoadFile {
+            get {
+                return ResourceManager.GetString("resLoadFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Тестовое задание.
         /// </summary>
         internal static string resMainWndTitle {
@@ -143,11 +188,47 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MB.
+        /// </summary>
+        internal static string resMB {
+            get {
+                return ResourceManager.GetString("resMB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to В ходе работы программы {0} произошла критическая ошибка &quot;{1}&quot;, приложение будет закрыто. Был создан файл отчета об ошибке {2}..
         /// </summary>
         internal static string resmsgfmtAppCrashed {
             get {
                 return ResourceManager.GetString("resmsgfmtAppCrashed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Воспроизвести.
+        /// </summary>
+        internal static string resPlayFile {
+            get {
+                return ResourceManager.GetString("resPlayFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Файл загружен.
+        /// </summary>
+        internal static string resSoundLoaded {
+            get {
+                return ResourceManager.GetString("resSoundLoaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Звуки.
+        /// </summary>
+        internal static string resSounds {
+            get {
+                return ResourceManager.GetString("resSounds", resourceCulture);
             }
         }
         

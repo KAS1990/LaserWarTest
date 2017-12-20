@@ -148,9 +148,14 @@
     <Compile Include="Stuff\DataDownloadComletedEventArgs.cs" />
     <Compile Include="Stuff\EntitiesContextEventArgs.cs" />
     <Compile Include="Stuff\SoundModelEventArgs.cs" />
+    <Compile Include="Stuff\SoundPlayingEventArgs.cs" />
     <Compile Include="Stuff\TaskJSONObject.cs" />
+    <Compile Include="Veiws\Converters\SizeMarkupConverter.cs" />
     <Compile Include="Veiws\DataDownloaderView.xaml.cs">
       <DependentUpon>DataDownloaderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Veiws\SoundsView.xaml.cs">
+      <DependentUpon>SoundsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\DataDownloaderViewModel.cs" />
     <Compile Include="ViewModels\SoundsViewModel.cs" />
@@ -189,6 +194,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Veiws\DataDownloaderView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Veiws\SoundsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

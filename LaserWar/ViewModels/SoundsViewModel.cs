@@ -5,6 +5,7 @@ using System.Text;
 using LaserWar.Global;
 using System.Collections.ObjectModel;
 using LaserWar.Models;
+using LaserWar.Stuff;
 
 namespace LaserWar.ViewModels
 {
@@ -19,16 +20,6 @@ namespace LaserWar.ViewModels
 		public ReadOnlyObservableCollection<SoundViewModel> Sounds { get; set; }
 
 
-		#region PlayingSound
-		private static readonly string PlayingSoundPropertyName = GlobalDefines.GetPropertyName<SoundsViewModel>(m => m.PlayingSound);
-
-		public SoundModel PlayingSound
-		{
-			get { return m_model.PlayingSound; }
-		}
-		#endregion
-
-
 		#region IsPlaying
 		private static readonly string IsPlayingPropertyName = GlobalDefines.GetPropertyName<SoundsViewModel>(m => m.IsPlaying);
 
@@ -39,26 +30,20 @@ namespace LaserWar.ViewModels
 		#endregion
 
 
-		#region CanPlay
-		private static readonly string CanPlayPropertyName = GlobalDefines.GetPropertyName<SoundsViewModel>(m => m.IsPlaying);
-
-		public bool CanPlay
-		{
-			get { return m_model.CanPlay; }
-		}
-		#endregion
-
-
 		public SoundsViewModel(SoundsModel model)
 		{
 			m_model = model;
 
 			// проброс изменившихся свойств модели во View
 			m_model.PropertyChanged += (s, e) => { OnPropertyChanged(e.PropertyName); };
-
-			ReloadSounds();
-			
+			m_model.PlayingStarted += m_model_PlayingStarted;
+			m_model.PlayingFinished += m_model_PlayingFinished;
+			m_model.SoundsReloaded += m_model_SoundsReloaded;
+										
 			Sounds = new ReadOnlyObservableCollection<SoundViewModel>(m_Sounds);
+			
+			// Заполняем m_Sounds
+			m_model_SoundsReloaded(this, new EventArgs());
 		}
 
 
@@ -67,13 +52,26 @@ namespace LaserWar.ViewModels
 		/// </summary>
 		public void ReloadSounds()
 		{
+			// Заставляем модель перезагрузить список звуков
+			m_model.ReloadSounds();
+		}
+
+
+		void m_model_SoundsReloaded(object sender, EventArgs e)
+		{
 			m_Sounds.Clear();
 
 			// Создаём коллекцию VM'ов на основании уже существующих моделей
 			foreach (SoundModel SoundModel in m_model.Sounds)
 				m_Sounds.Add(new SoundViewModel(SoundModel, this));
+		}
 
-			m_model.ReloadSounds();
+
+		private SoundViewModel GetSound(int SoundId)
+		{
+			return (from snd in Sounds
+					where snd.id_sound == SoundId
+					select snd).FirstOrDefault();
 		}
 
 
@@ -84,15 +82,6 @@ namespace LaserWar.ViewModels
 		public void Play(SoundViewModel Sound)
 		{
 			m_model.Play(Sound.id_sound);
-		}
-
-
-		/// <summary>
-		/// Остановка проигрывания файла
-		/// </summary>
-		public void StopPlaying(SoundViewModel Sound)
-		{
-			m_model.StopPlaying(Sound.id_sound);
 		}
 
 
@@ -110,6 +99,18 @@ namespace LaserWar.ViewModels
 		{
 			foreach (SoundViewModel sound in Sounds)
 				sound.StopDownloading();
+		}
+
+
+		void m_model_PlayingStarted(object sender, SoundPlayingEventArgs e)
+		{
+			GetSound(e.Sound.Sound.id_sound).IsPlaying = true;
+		}
+
+
+		void m_model_PlayingFinished(object sender, SoundPlayingEventArgs e)
+		{
+			GetSound(e.Sound.Sound.id_sound).IsPlaying = false;
 		}
 	}
 }

@@ -151,4 +151,31 @@
     <value>Не удалось загрузить файл:
 {0}</value>
   </data>
+  <data name="resB" xml:space="preserve">
+    <value>B</value>
+  </data>
+  <data name="resFileName" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="resFileSize" xml:space="preserve">
+    <value>Размер файла</value>
+  </data>
+  <data name="resKB" xml:space="preserve">
+    <value>KB</value>
+  </data>
+  <data name="resLoadFile" xml:space="preserve">
+    <value>Загрузка файла</value>
+  </data>
+  <data name="resMB" xml:space="preserve">
+    <value>MB</value>
+  </data>
+  <data name="resSoundLoaded" xml:space="preserve">
+    <value>Файл загружен</value>
+  </data>
+  <data name="resSounds" xml:space="preserve">
+    <value>Звуки</value>
+  </data>
+  <data name="resPlayFile" xml:space="preserve">
+    <value>Воспроизвести</value>
+  </data>
 </root>

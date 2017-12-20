@@ -65,6 +65,7 @@
 		<Setter Property="HorizontalContentAlignment" Value="{StaticResource TextboxHorizontalContentAlignment}" />
 		<Setter Property="BorderThickness" Value="{StaticResource TextBoxBorderThickness}" />
 		<Setter Property="BorderBrush" Value="{StaticResource TextboxEnabledBorderBrush}" />
+		<Setter Property="TextWrapping" Value="Wrap" />
 	</Style>
 	
 	<!-- Первый стиль кнопок -->
@@ -162,5 +163,48 @@
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
+	</Style>
+	
+	<!-- Подписи к прогресс барам  -->
+	<Style x:Key="ProgressBarTitleStyle" TargetType="TextBlock">
+		<Setter Property="Foreground" Value="{StaticResource TextboxForegroundBrush}" />
+		<Setter Property="Background" Value="{StaticResource TextboxBackgroundBrush}" />
+		<Setter Property="FontFamily" Value="{StaticResource MainFont}" />
+		<Setter Property="FontSize" Value="{StaticResource SmallFontSize}" />
+		<Setter Property="Padding" Value="{StaticResource TextboxPadding}" />
+		<Setter Property="TextAlignment" Value="{StaticResource TextBlockTextAlignment}" />
+		<Setter Property="Opacity" Value="{StaticResource StandartOpacity}" />
+	</Style>
+	
+	<!-- Стиль кнопок, которые представляют собой картинки -->
+	<ControlTemplate x:Key="ImageButtonTemplate" TargetType="Button" >
+		<Image Stretch="Uniform" Source="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" />
+		
+		<ControlTemplate.Triggers>
+			<MultiTrigger>
+				<MultiTrigger.Conditions>
+					<Condition Property="IsMouseOver" Value="True" />
+					<Condition Property="IsEnabled" Value="True" />
+				</MultiTrigger.Conditions>
+									
+				<Setter Property="RenderTransform">
+					<Setter.Value>
+						<TransformGroup>
+							<ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+							<TranslateTransform X="-2.8" Y="-1.4" />
+						</TransformGroup>
+					</Setter.Value>
+				</Setter>
+			</MultiTrigger>
+		</ControlTemplate.Triggers>
+	</ControlTemplate>
+	
+	<!-- Стиль ProgressBar'ов, расположенных в DataGrid и отображающих ход выполнения операций -->
+	<Style x:Key="ProgressBarOnDataGridStyle" TargetType="ProgressBar">
+		<Setter Property="Background" Value="{StaticResource RowBordersBrush}" />
+		<Setter Property="Foreground" Value="{StaticResource ProgressBarProgressBrush}" />
+		<Setter Property="Height" Value="3" />
+		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="Width" Value="150" />
 	</Style>
 </ResourceDictionary>

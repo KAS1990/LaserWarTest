@@ -81,6 +81,28 @@ namespace LaserWar.Models
 		#endregion
 
 
+		#region InDownloading
+		public static readonly string InDownloadingPropertyName = GlobalDefines.GetPropertyName<SoundModel>(m => m.InDownloading);
+
+		private bool m_InDownloading = false;
+		/// <summary>
+		/// В данный момент загружаем файл
+		/// </summary>
+		public bool InDownloading
+		{
+			get { return m_InDownloading; }
+			set
+			{
+				if (m_InDownloading != value)
+				{
+					m_InDownloading = value;
+					OnSoundUpdated(InDownloadingPropertyName);
+				}
+			}
+		}
+		#endregion
+
+
 		#region DownloadProgressPercent
 		private static readonly string DownloadProgressPercentPropertyName = GlobalDefines.GetPropertyName<SoundModel>(m => m.DownloadProgressPercent);
 
@@ -115,7 +137,6 @@ namespace LaserWar.Models
 				{
 					m_PlaybackProgressPercent = value;
 					OnSoundUpdated(PlaybackProgressPercentPropertyName);
-
 				}
 			}
 		}
@@ -231,13 +252,15 @@ namespace LaserWar.Models
 		#region Загрузка файла
 		public void DownloadFile()
 		{
-			if (!IsDownloaded)
+			if (!IsDownloaded && !InDownloading)
 			{
+				InDownloading = true;
+
 				string DestFilePath = Directory.GetCurrentDirectory() + "\\" + FileName;
 
 				if (File.Exists(DestFilePath))
 					File.Delete(DestFilePath);
-
+				
 				m_FileDowloader.QueryString.Add(sound.file_pathPropertyName, DestFilePath);
 				m_FileDowloader.DownloadFileAsync(new Uri(Sound.url), DestFilePath);
 			}
@@ -261,17 +284,19 @@ namespace LaserWar.Models
 			if (e.Cancelled)
 			{
 				Sound.file_path = null;
-				m_FileDowloader.QueryString.Clear();
 				DownloadProgressPercent = 0;
 			}
 			else
 			{
 				Sound.file_path = m_FileDowloader.QueryString[sound.file_pathPropertyName];
-				m_FileDowloader.QueryString.Clear();
 				DownloadProgressPercent = 100;
 
 				UpdateSoundInDB(Sound);
 			}
+
+			m_FileDowloader.QueryString.Clear();
+
+			InDownloading = false;
 		}
 		#endregion
 
@@ -296,7 +321,7 @@ namespace LaserWar.Models
 		{
 			if (IsPlaying)
 			{	// Сейчас что-то проигрываем => можно остановить
-				m_Parent.StopPlaying(m_SoundId);
+				m_Parent.StopPlaying();
 			}
 		}
 		#endregion

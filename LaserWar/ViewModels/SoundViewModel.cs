@@ -110,7 +110,7 @@ namespace LaserWar.ViewModels
 		/// </summary>
 		public bool InDownloading
 		{
-			get { return !m_DownloadCommand.CanExecute(null); }
+			get { return m_model.InDownloading; }
 		}
 		#endregion
 
@@ -201,13 +201,13 @@ namespace LaserWar.ViewModels
 			// проброс изменившихся свойств модели во View
 			m_model.SoundUpdated += model_SoundUpdated;
 
-			m_DownloadCommand = new RelayCommand(arg => m_model.DownloadFile(), arg => !m_model.IsDownloaded);
+			m_DownloadCommand = new RelayCommand(arg => DownloadFile(), arg => !IsDownloaded);
 			m_DownloadCommand.CanExecuteChanged += (s, e) =>
 			{
 				OnPropertyChanged(InDownloadingPropertyName);
 			};
 
-			m_PlayCommand = new RelayCommand(arg => m_model.Play(), arg => m_model.CanPlay);
+			m_PlayCommand = new RelayCommand(PlayingCommandExecute, arg => CanPlay);
 			m_PlayCommand.CanExecuteChanged += (s, e) =>
 			{
 				OnPropertyChanged(IsPlayingPropertyName);
@@ -233,12 +233,6 @@ namespace LaserWar.ViewModels
 		}
 
 
-		public void UpdateSoundInDB(sound NewValue)
-		{
-			m_model.UpdateSoundInDB(NewValue);
-		}
-
-
 		#region Загрузка файла
 		public void DownloadFile()
 		{
@@ -255,14 +249,24 @@ namespace LaserWar.ViewModels
 
 		#region Проигрывание звука
 		/// <summary>
+		/// Обработчик команды m_PlayCommand
+		/// </summary>
+		/// <param name="parameter"></param>
+		void PlayingCommandExecute(object parameter)
+		{
+			if (IsPlaying)
+				StopPlaying();
+			else
+				Play();
+		}
+
+
+		/// <summary>
 		/// Проигрывание файла
 		/// </summary>
 		public void Play()
 		{
-			if (CanPlay)
-			{	// Файл можно проигрывать => сообщаем об этом родителю
-				m_model.Play();
-			}
+			m_model.Play();
 		}
 
 
@@ -271,10 +275,7 @@ namespace LaserWar.ViewModels
 		/// </summary>
 		public void StopPlaying()
 		{
-			if (IsPlaying)
-			{	// Сейчас что-то проигрываем => можно остановить
-				m_model.StopPlaying();
-			}
+			m_model.StopPlaying();
 		}
 		#endregion
 	}

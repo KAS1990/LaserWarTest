@@ -45,6 +45,7 @@ namespace LaserWar
 	{
 		EntitiesContext m_db = null;
 		DataDownloaderViewModel m_DataDownloader = null;
+		SoundsViewModel m_Sounds = null;
 
 		
 		#region ShowShadow
@@ -100,7 +101,7 @@ namespace LaserWar
 		public MainWindow()
 		{
 			InitializeComponent();
-
+			
 			GlobalDefines.SuppressWininetBehavior();
 						
 			try
@@ -108,21 +109,25 @@ namespace LaserWar
 				m_db = new EntitiesContext();
 				m_db.LoadAllDataSets();
 
-				DataDownloaderModel DataDownloader = new DataDownloaderModel(m_db,
+				DataDownloaderModel modelDataDownloader = new DataDownloaderModel(m_db,
 															LaserWar.Properties.Settings.Default.TaskUrl,
 															LaserWar.Properties.Settings.Default.TaskLoaded ? LaserWar.Properties.Settings.Default.TaskJSONText : null);
-				m_DataDownloader = new DataDownloaderViewModel(DataDownloader);
+				m_DataDownloader = new DataDownloaderViewModel(modelDataDownloader);
 				m_DataDownloader.DownloadComleted += DataDownloader_DownloadComleted;
 				m_DataDownloader.DownloadStarted += DataDownloader_DownloadStarted;
-
+								
 				tbctrlPanels.Items.Add(new TabItem()
 					{
 						Header = new Uri("Images/download.png", UriKind.Relative),
 						Content = new DataDownloaderView(m_DataDownloader)
 					});
+
+				SoundsModel modelSounds = new SoundsModel(m_db);
+				m_Sounds = new SoundsViewModel(modelSounds);
 				tbctrlPanels.Items.Add(new TabItem()
 				{
 					Header = new Uri("Images/sounds.png", UriKind.Relative),
+					Content = new SoundsView(m_Sounds)
 				});
 				tbctrlPanels.Items.Add(new TabItem()
 				{
@@ -180,6 +185,8 @@ namespace LaserWar
 			Measure(GlobalDefines.STD_SIZE_FOR_MEASURE);
 			MinWidth = DesiredSize.Width;
 			MinHeight = DesiredSize.Height;
+
+			GlobalDefines.AutoscaleTabs(tbctrlPanels, null, null);
 		}
 	}
 }

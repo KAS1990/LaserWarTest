@@ -38,6 +38,32 @@ namespace LaserWar.Models
 		};
 
 
+		#region События
+		public event EventHandler<SoundPlayingEventArgs> PlayingStarted;
+		private void OnPlayingStarted(SoundModel Sound)
+		{
+			if (PlayingStarted != null)
+				PlayingStarted(this, new SoundPlayingEventArgs(Sound));
+		}
+
+
+		public event EventHandler<SoundPlayingEventArgs> PlayingFinished;
+		private void OnPlayingFinished(SoundModel Sound)
+		{
+			if (PlayingFinished != null)
+				PlayingFinished(this, new SoundPlayingEventArgs(Sound));
+		}
+
+
+		public event EventHandler SoundsReloaded;
+		private void OnSoundsReloaded()
+		{
+			if (SoundsReloaded != null)
+				SoundsReloaded(this, new EventArgs());
+		}
+		#endregion
+
+
 		#region PlayingSound
 		private static readonly string PlayingSoundPropertyName = GlobalDefines.GetPropertyName<SoundsModel>(m => m.PlayingSound);
 
@@ -52,7 +78,6 @@ namespace LaserWar.Models
 					m_PlayingSound = value;
 					OnPropertyChanged(PlayingSoundPropertyName);
 					OnPropertyChanged(IsPlayingPropertyName);
-					OnPropertyChanged(CanPlayPropertyName);
 				}
 			}
 		}
@@ -69,16 +94,6 @@ namespace LaserWar.Models
 		#endregion
 
 
-		#region CanPlay
-		private static readonly string CanPlayPropertyName = GlobalDefines.GetPropertyName<SoundsModel>(m => m.IsPlaying);
-
-		public bool CanPlay
-		{
-			get { return Sounds.Count > 0 && Sounds.FirstOrDefault(arg => arg.IsDownloaded) != null && !IsPlaying; }
-		}
-		#endregion
-
-
 		/// <summary>
 		/// Конструктор, загружающий модели из БД или из списка
 		/// </summary>
@@ -87,10 +102,7 @@ namespace LaserWar.Models
 		{
 			m_DBContext = dbContext;
 
-			m_DBContext.ChangesSavedToDB += (s, e) => { ReloadSounds(); };
-
 			Sounds = new ReadOnlyObservableCollection<SoundModel>(m_Sounds);
-			(Sounds as INotifyCollectionChanged).CollectionChanged += Sounds_CollectionChanged;
 			
 			ReloadSounds();
 
@@ -110,6 +122,8 @@ namespace LaserWar.Models
 
 			foreach (sound snd in m_DBContext.sounds)
 				m_Sounds.Add(new SoundModel(snd, this));
+
+			OnSoundsReloaded();
 		}
 
 
@@ -125,20 +139,17 @@ namespace LaserWar.Models
 		}
 
 
-		void Sounds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-		{
-			OnPropertyChanged(CanPlayPropertyName);
-		}
-
-
 		#region Проигрывание звука
 		void Player_MediaEnded(object sender, EventArgs e)
 		{
-			m_tmrPlayingProgress.Stop();
-			PlayingSound.PlaybackProgressPercent = 100;
-			PlayingSound.PlaybackTime = m_Player.NaturalDuration.TimeSpan;
+			if (IsPlaying)
+			{
+				PlayingSound.PlaybackProgressPercent = 100;
+				PlayingSound.PlaybackTime = m_Player.NaturalDuration.TimeSpan;
+				PlayingSound.IsPlaying = false;
 
-			PlayingSound.IsPlaying = false;
+				StopPlayingInternal();
+			}
 		}
 
 
@@ -159,47 +170,52 @@ namespace LaserWar.Models
 
 
 		/// <summary>
-		/// Проигрывание файла
+		/// Проигрывание файла. Если при этом воспроизводится другой файл, то его воспроизведение прерывается
 		/// </summary>
 		public void Play(int SoundId)
 		{
-			if (CanPlay)
-			{	// Файл можно проигрывать
-				PlayingSound = Sounds.FirstOrDefault(arg => arg.Sound.id_sound == SoundId);
-				if (PlayingSound != null)
-				{
-					PlayingSound.PlaybackProgressPercent = 0;
-					PlayingSound.PlaybackTime = new TimeSpan(0, 0, 0);
-					m_Player.Open(new Uri(PlayingSound.Sound.file_path));
+			SoundModel SoundToPlay = Sounds.FirstOrDefault(arg => arg.Sound.id_sound == SoundId);
+			if (SoundToPlay != null)
+			{
+				if (IsPlaying)
+				{	// Сейчас проигрываем другой файл => останавливаем его
+					StopPlaying();
 				}
+				PlayingSound = SoundToPlay;
+										
+				PlayingSound.PlaybackProgressPercent = 0;
+				PlayingSound.PlaybackTime = new TimeSpan(0, 0, 0);
+				PlayingSound.IsPlaying = true;
+					
+				m_Player.Open(new Uri(PlayingSound.Sound.file_path));
+
+				OnPlayingStarted(PlayingSound);
 			}
 		}
-
-
+		
+		
 		/// <summary>
 		/// Остановка проигрывания файла
 		/// </summary>
-		public void StopPlaying(int SoundId)
-		{
-			if (IsPlaying && PlayingSound.Sound.id_sound == SoundId)
-			{	// Сейчас что-то проигрываем => можно остановить
-				m_tmrPlayingProgress.Stop();
-				m_Player.Stop();
-
-				PlayingSound.IsPlaying = false;
-			}
-		}
-
-
 		public void StopPlaying()
 		{
 			if (IsPlaying)
 			{	// Сейчас что-то проигрываем => можно остановить
-				m_tmrPlayingProgress.Stop();
-				m_Player.Stop();
-
-				PlayingSound.IsPlaying = false;
+				StopPlayingInternal();
 			}
+		}
+
+		void StopPlayingInternal()
+		{
+			m_tmrPlayingProgress.Stop();
+			m_Player.Stop();
+			m_Player.Close();
+
+			PlayingSound.IsPlaying = false;
+						
+			//OnPlayingFinished(PlayingSound);
+
+			PlayingSound = null;
 		}
 		#endregion
 

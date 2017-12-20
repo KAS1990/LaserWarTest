@@ -51,9 +51,10 @@
 
 
 	<!-- Дополнительные цвета -->
-	<SolidColorBrush x:Key="ProgressBarBrush" Color="#FF005AFF"/>
+	<SolidColorBrush x:Key="ProgressBarProgressBrush" Color="#FF005AFF" />
+	<SolidColorBrush x:Key="ProgressBarBackgroundBrush" Color="#FFF0F0F0" />
 	<SolidColorBrush x:Key="TextboxEnabledBorderBrush" Color="#FF005AFF"/>
-	<SolidColorBrush x:Key="RowBordersBrush" Color="#FFFDFDFD"/>
+	<SolidColorBrush x:Key="RowBordersBrush" Color="#FFF0F0F0" Opacity="{StaticResource StandartOpacity}" />
 	<SolidColorBrush x:Key="WaitingCircleBrush" Color="White"/>
 	<SolidColorBrush x:Key="ButtonBorderBrush1" Color="#FF005AFF"/>
 	<SolidColorBrush x:Key="ScrollbarBackgroundBrush" Color="White"/>

@@ -177,8 +177,7 @@ namespace LaserWar.Models
 					TaskJSONObject LoadedObject = JsonConvert.DeserializeObject<TaskJSONObject>(e.Result);
 										
 					// Пишем объект в БД, предварительно очистив её
-					for (int i = 0; i < m_DBContext.sounds.Local.Count; i++)
-						m_DBContext.Entry(m_DBContext.sounds.Local[i]).State = EntityState.Deleted;
+					m_DBContext.sounds.RemoveRange(m_DBContext.sounds);
 					m_DBContext.SaveChanges(false);
 
 					foreach (sound jsonSound in LoadedObject.sounds)

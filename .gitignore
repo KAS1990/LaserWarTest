@@ -30,3 +30,8 @@ LaserWar/obj/x86/Debug/LaserWarApp.g.cs
 LaserWar/obj/x86/Debug/MainWindow.g.cs
 LaserWar/obj/x86/Debug/MainWindow.g.i.cs
 LaserWar/obj/x86/Debug/Veiws/DataDownloaderView.g.cs
+LaserWar/bin/Debug/HtmlAgilityPack.xml
+LaserWar/LaserWar.sln.docstates.suo
+LaserWar/LaserWar.suo
+*.suo
+*.cache
