@@ -9,6 +9,7 @@ using System.Windows.Threading;
 using System.Collections.ObjectModel;
 using LaserWar.Stuff;
 using System.Collections.Specialized;
+using System.Data.Entity.Infrastructure;
 
 namespace LaserWar.Models
 {
@@ -53,14 +54,6 @@ namespace LaserWar.Models
 			if (PlayingFinished != null)
 				PlayingFinished(this, new SoundPlayingEventArgs(Sound));
 		}
-
-
-		public event EventHandler SoundsReloaded;
-		private void OnSoundsReloaded()
-		{
-			if (SoundsReloaded != null)
-				SoundsReloaded(this, new EventArgs());
-		}
 		#endregion
 
 
@@ -101,6 +94,7 @@ namespace LaserWar.Models
 		public SoundsModel(EntitiesContext dbContext)
 		{
 			m_DBContext = dbContext;
+			m_DBContext.ChangesSavedToDB += m_DBContext_ChangesSavedToDB;
 
 			Sounds = new ReadOnlyObservableCollection<SoundModel>(m_Sounds);
 			
@@ -114,6 +108,41 @@ namespace LaserWar.Models
 
 
 		/// <summary>
+		/// Изменения были сохранены в БД
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		void m_DBContext_ChangesSavedToDB(object sender, EntitiesContextEventArgs e)
+		{
+			foreach (EntitiesContextEventArgs.DbEntity entity in e.Changes)
+			{
+				if (entity.Value is sound)
+				{	// Нас интересуют только звуки
+					SoundModel SoundToChange = m_Sounds.FirstOrDefault(arg => arg.Sound.Equals(entity.Value));
+					switch (entity.State)
+					{
+						case System.Data.Entity.EntityState.Modified:
+							if (SoundToChange != null)
+								SoundToChange.UpdateFromDB();
+							break;
+
+						case System.Data.Entity.EntityState.Deleted:
+							if (SoundToChange != null)
+								m_Sounds.Remove(SoundToChange);
+							break;
+
+						case System.Data.Entity.EntityState.Added:
+							if (SoundToChange != null)
+								m_Sounds.Remove(SoundToChange);
+							m_Sounds.Add(new SoundModel((entity.Value as sound), this));
+							break;
+					}
+				}
+			}
+		}
+
+
+		/// <summary>
 		/// Загрузить звуки из БД
 		/// </summary>
 		public void ReloadSounds()
@@ -122,8 +151,6 @@ namespace LaserWar.Models
 
 			foreach (sound snd in m_DBContext.sounds)
 				m_Sounds.Add(new SoundModel(snd, this));
-
-			OnSoundsReloaded();
 		}
 
 
@@ -172,7 +199,7 @@ namespace LaserWar.Models
 		/// <summary>
 		/// Проигрывание файла. Если при этом воспроизводится другой файл, то его воспроизведение прерывается
 		/// </summary>
-		public void Play(int SoundId)
+		public void Play(long SoundId)
 		{
 			SoundModel SoundToPlay = Sounds.FirstOrDefault(arg => arg.Sound.id_sound == SoundId);
 			if (SoundToPlay != null)
@@ -213,7 +240,7 @@ namespace LaserWar.Models
 
 			PlayingSound.IsPlaying = false;
 						
-			//OnPlayingFinished(PlayingSound);
+			OnPlayingFinished(PlayingSound);
 
 			PlayingSound = null;
 		}

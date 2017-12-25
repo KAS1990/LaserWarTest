@@ -19,7 +19,7 @@ namespace LaserWar.ViewModels
 		#region id_sound
 		private static readonly string id_soundPropertyName = GlobalDefines.GetPropertyName<SoundViewModel>(m => m.id_sound);
 
-		public int id_sound
+		public long id_sound
 		{
 			get { return m_model.Sound.id_sound; }
 			set { m_model.Sound.id_sound = value; }
@@ -101,6 +101,7 @@ namespace LaserWar.ViewModels
 			get { return m_model.IsDownloaded; }
 		}
 		#endregion
+
 
 		#region InDownloading
 		public static readonly string InDownloadingPropertyName = GlobalDefines.GetPropertyName<SoundViewModel>(m => m.InDownloading);

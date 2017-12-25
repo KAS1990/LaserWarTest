@@ -326,4 +326,111 @@ namespace LaserWar.Global.Converters
 		{
 		}
 	}
+
+
+	/// <summary>
+	/// Проверяет правильность заполнения полей типа int
+	/// </summary>
+	public class IntParseMarkupConverter : MarkupConverterBase
+	{
+		/// <summary>
+		/// int -> string
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="targetType"></param>
+		/// <param name="parameter"></param>
+		/// <param name="culture"></param>
+		/// <returns></returns>
+		public override object Convert(object value, Type targetType,
+			object parameter, CultureInfo culture)
+		{
+			if (value != null && value is int)
+				return value.ToString();
+			else
+				return "";
+		}
+
+
+		/// <summary>
+		/// string -> int
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="targetType"></param>
+		/// <param name="parameter"></param>
+		/// <param name="culture"></param>
+		/// <returns></returns>
+		public override object ConvertBack(object value, Type targetType,
+			object parameter, CultureInfo culture)
+		{
+			int i = 0;
+			if (value != null && int.TryParse(value.ToString(), out i))
+				return i;
+			else
+				return -1;
+		}
+
+
+		public IntParseMarkupConverter() :
+			base()
+		{
+		}
+	}
+
+
+	/// <summary>
+	/// Проверяет правильность заполнения полей типа float
+	/// </summary>
+	public class FloatParseMarkupConverter : MarkupConverterBase
+	{
+		/// <summary>
+		/// float -> string
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="targetType"></param>
+		/// <param name="parameter"></param>
+		/// <param name="culture"></param>
+		/// <returns></returns>
+		public override object Convert(object value, Type targetType,
+			object parameter, CultureInfo culture)
+		{
+			if (value != null && value is float)
+			{	// В parameter находится формат вывода числа
+				try
+				{
+					return parameter != null ? ((float)value).ToString(parameter.ToString()) : value.ToString();
+				}
+				catch
+				{
+					return "";
+				}
+			}
+			else
+				return "";
+		}
+
+
+		/// <summary>
+		/// string -> float
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="targetType"></param>
+		/// <param name="parameter"></param>
+		/// <param name="culture"></param>
+		/// <returns></returns>
+		public override object ConvertBack(object value, Type targetType,
+			object parameter, CultureInfo culture)
+		{
+			float i = 0;
+			if (value != null && float.TryParse(value.ToString(), out i))
+				return i;
+			else
+				return -1;
+		}
+
+
+		public FloatParseMarkupConverter() :
+			base()
+		{
+		}
+	}
 }

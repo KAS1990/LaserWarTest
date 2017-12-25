@@ -10,7 +10,7 @@ namespace LaserWar.Stuff
 	/// <summary>
 	/// TO DO: доделать класс игры
 	/// </summary>
-	public class Game
+	public class JSONGame
 	{
 		public string url { get; set; }
 	}
@@ -22,7 +22,7 @@ namespace LaserWar.Stuff
 	public class TaskJSONObject
 	{
 		public string error { get; set; }
-		public Game[] games { get; set; }
+		public JSONGame[] games { get; set; }
 		public sound[] sounds { get; set; }
 	}
 }

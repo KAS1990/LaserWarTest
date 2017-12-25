@@ -178,4 +178,61 @@
   <data name="resPlayFile" xml:space="preserve">
     <value>Воспроизвести</value>
   </data>
+  <data name="resGameDate" xml:space="preserve">
+    <value>Дата проведения</value>
+  </data>
+  <data name="resGameName" xml:space="preserve">
+    <value>Название игры</value>
+  </data>
+  <data name="resGames" xml:space="preserve">
+    <value>Игры</value>
+  </data>
+  <data name="resPlayer" xml:space="preserve">
+    <value>Игрок</value>
+  </data>
+  <data name="resPlayersCount" xml:space="preserve">
+    <value>Количество игроков</value>
+  </data>
+  <data name="resToPDF" xml:space="preserve">
+    <value>Сохранить как PDF</value>
+  </data>
+  <data name="resToVk" xml:space="preserve">
+    <value>Опубликовать в ВК</value>
+  </data>
+  <data name="resAccuracy" xml:space="preserve">
+    <value>Точность</value>
+  </data>
+  <data name="resPercent" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="resRating" xml:space="preserve">
+    <value>Рейтинг</value>
+  </data>
+  <data name="resShots" xml:space="preserve">
+    <value>Выстрелы</value>
+  </data>
+  <data name="resCancel" xml:space="preserve">
+    <value>Отменить</value>
+  </data>
+  <data name="resEditPlayer" xml:space="preserve">
+    <value>Редактирование игрока</value>
+  </data>
+  <data name="resPlayerName" xml:space="preserve">
+    <value>Имя игрока</value>
+  </data>
+  <data name="resSave" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="resAccuracyMustBeFrom0To1" xml:space="preserve">
+    <value>Точность должна быть в диапазоне от 0% до 100%</value>
+  </data>
+  <data name="resNameCouldNotBeEmpty" xml:space="preserve">
+    <value>Поле "Имя игрока" не должно быть пустым</value>
+  </data>
+  <data name="resRatingMustBeNotNegative" xml:space="preserve">
+    <value>Рейтинг должен быть положительным числом</value>
+  </data>
+  <data name="resShotsMustBeNotNegative" xml:space="preserve">
+    <value>Число выстрелов не должно быть отрицательным</value>
+  </data>
 </root>

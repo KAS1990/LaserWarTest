@@ -1,0 +1,457 @@
+﻿<glob:CNotifyPropertyChangedUserCtrl x:Class="LaserWar.Views.GameView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:local="clr-namespace:LaserWar.Views"
+			 xmlns:convs="clr-namespace:LaserWar.Views.Converters"
+             xmlns:glob="clr-namespace:LaserWar.Global"
+			 xmlns:gconvs="clr-namespace:LaserWar.Global.Converters"
+			 xmlns:stuff="clr-namespace:LaserWar.Stuff"
+	Margin="0">
+	
+    <glob:CNotifyPropertyChangedUserCtrl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="..\Templates\CommonControlsTemplates.xaml" />
+				<ResourceDictionary Source="..\Templates\CommonResources.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			
+			<CollectionViewSource x:Key="vsrcPlayers" Source="{Binding Players}">
+				<CollectionViewSource.GroupDescriptions>
+					<PropertyGroupDescription PropertyName="TeamId" />
+				</CollectionViewSource.GroupDescriptions>
+			</CollectionViewSource>
+			
+			<ControlTemplate x:Key="GroupExpanderTemplate" TargetType="{x:Type Expander}">
+				<DockPanel LastChildFill="True">
+					<ToggleButton DockPanel.Dock="Top"
+								  x:Name="PART_Button"
+								  OverridesDefaultStyle="True"
+								  IsChecked="{Binding Path=IsExpanded, RelativeSource={RelativeSource TemplatedParent}}">
+						<ToggleButton.Template>
+							<ControlTemplate TargetType="ToggleButton">
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Margin="0,0,10,0"
+												Text="{Binding Header, RelativeSource={RelativeSource AncestorType=Expander}}"
+												Foreground="{StaticResource TextboxForegroundBrush}"
+												Background="{StaticResource TextboxBackgroundBrush}"
+												FontFamily="{StaticResource TextFont}"
+												FontSize="20"
+												FontWeight="Bold"
+												Opacity="{StaticResource StandartOpacity}"
+												Padding="{StaticResource TextboxPadding}"
+												TextAlignment="{StaticResource TextBlockTextAlignment}" />
+										
+									<Image x:Name="PART_Image"
+										   Height="7"
+										   Width="10"
+										   Stretch="Uniform"
+										   VerticalAlignment="Center"
+										   RenderTransformOrigin="0.5,0.5"
+										   Source="/LaserWar;component/Images/hide show.png" >
+										<Image.RenderTransform>
+											<RotateTransform Angle="0" />
+										</Image.RenderTransform>
+									</Image>
+								</StackPanel>
+									
+								<ControlTemplate.Triggers>
+									<MultiTrigger>
+										<MultiTrigger.Conditions>
+											<Condition Property="IsMouseOver" Value="true" />
+											<Condition Property="IsChecked" Value="True" />
+										</MultiTrigger.Conditions>
+										
+										<Setter Property="RenderTransform" TargetName="PART_Image">
+											<Setter.Value>
+												<TransformGroup>
+													<ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+													<RotateTransform Angle="0" />
+												</TransformGroup>
+											</Setter.Value>
+										</Setter>
+									</MultiTrigger>
+									
+									<MultiTrigger>
+										<MultiTrigger.Conditions>
+											<Condition Property="IsMouseOver" Value="false" />
+											<Condition Property="IsChecked" Value="True" />
+										</MultiTrigger.Conditions>
+										
+										<Setter Property="RenderTransform" TargetName="PART_Image">
+											<Setter.Value>
+												<TransformGroup>
+													<RotateTransform Angle="0" />
+												</TransformGroup>
+											</Setter.Value>
+										</Setter>
+									</MultiTrigger>
+									
+									<MultiTrigger>
+										<MultiTrigger.Conditions>
+											<Condition Property="IsMouseOver" Value="true" />
+											<Condition Property="IsChecked" Value="false" />
+										</MultiTrigger.Conditions>
+										
+										<Setter Property="RenderTransform" TargetName="PART_Image">
+											<Setter.Value>
+												<TransformGroup>
+													<ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+													<RotateTransform Angle="180" />
+												</TransformGroup>
+											</Setter.Value>
+										</Setter>
+									</MultiTrigger>
+								</ControlTemplate.Triggers>
+							</ControlTemplate>
+						</ToggleButton.Template>
+					</ToggleButton>
+
+					<ContentPresenter x:Name="PART_Content" Visibility="Collapsed"/>
+				</DockPanel>
+				
+				<ControlTemplate.Triggers>
+					<Trigger Property="IsExpanded" Value="True">
+						<Setter TargetName="PART_Content" Property="Visibility" Value="Visible"/>
+					</Trigger>
+				</ControlTemplate.Triggers>
+			</ControlTemplate>
+			
+			<Style x:Key="MyColumnHeaderStyle" TargetType="Button">
+				<Setter Property="Command" Value="{Binding SelectCommand}" />
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="Button">
+							<Border>
+								<StackPanel Orientation="Horizontal">
+									<Label Name="PART_Text"
+										   Content="{TemplateBinding Content}"
+										   Margin="0,0,10,2"
+										   RenderTransformOrigin="0.5,0.5"
+										   Style="{StaticResource TextBoxNameStyle}" />
+									<!-- Задавать видимость сортировки будем передавать через свойство Tag, т.к. это удобно -->
+									<Image Name="PART_Image"
+										   Source="/LaserWar;component/Images/sort.png"
+										   RenderTransformOrigin="0,0.5"
+										   Visibility="{Binding IsSelected, Mode=OneWay, Converter={gconvs:BoolToVisibilityMarkupConverter UnvisibleValue=Hidden}}"
+										   Opacity="{StaticResource StandartOpacity}">
+										<Image.RenderTransform>
+											<ScaleTransform ScaleY="-1" />
+										</Image.RenderTransform>
+									</Image>
+								</StackPanel>
+							</Border>
+											
+							<ControlTemplate.Triggers>
+								<MultiDataTrigger>
+									<MultiDataTrigger.Conditions>
+										<Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true" />
+										<!-- По возрастанию -->
+										<Condition Binding="{Binding Direction, Converter={convs:SortDirToBoolConverter}}" Value="True" />
+									</MultiDataTrigger.Conditions>
+										
+									<Setter Property="RenderTransform" TargetName="PART_Image">
+										<Setter.Value>
+											<ScaleTransform ScaleY="-1" ScaleX="1.2" />
+										</Setter.Value>
+									</Setter>
+									
+									<Setter Property="RenderTransform" TargetName="PART_Text">
+										<Setter.Value>
+											<ScaleTransform ScaleY="1.1" ScaleX="1.1" />
+										</Setter.Value>
+									</Setter>
+								</MultiDataTrigger>
+									
+								<MultiDataTrigger>
+									<MultiDataTrigger.Conditions>
+										<Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="false" />
+										<!-- По убыванию -->
+										<Condition Binding="{Binding Direction, Converter={convs:SortDirToBoolConverter}}" Value="false" />
+									</MultiDataTrigger.Conditions>
+										
+									<Setter Property="RenderTransform" TargetName="PART_Image">
+										<Setter.Value>
+											<ScaleTransform ScaleY="1" />
+										</Setter.Value>
+									</Setter>
+								</MultiDataTrigger>
+									
+								<MultiDataTrigger>
+									<MultiDataTrigger.Conditions>
+										<Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="true" />
+										<!-- По убыванию -->
+										<Condition Binding="{Binding Direction, Converter={convs:SortDirToBoolConverter}}" Value="false" />
+									</MultiDataTrigger.Conditions>
+										
+									<Setter Property="RenderTransform" TargetName="PART_Image">
+										<Setter.Value>
+											<ScaleTransform ScaleX="1.2" />
+										</Setter.Value>
+									</Setter>
+									
+									<Setter Property="RenderTransform" TargetName="PART_Text">
+										<Setter.Value>
+											<ScaleTransform ScaleY="1.1" ScaleX="1.1" />
+										</Setter.Value>
+									</Setter>
+								</MultiDataTrigger>
+							</ControlTemplate.Triggers>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
+			
+		</ResourceDictionary>
+	</glob:CNotifyPropertyChangedUserCtrl.Resources>
+		
+	<glob:CNotifyPropertyChangedUserCtrl.Style>
+		<!-- стиль PanelStyle можно применять только после ResourceDictionary -->
+		<Style TargetType="UserControl" BasedOn="{StaticResource PanelStyle}"/>
+	</glob:CNotifyPropertyChangedUserCtrl.Style>
+	
+	<DockPanel LastChildFill="True" >
+		<DockPanel LastChildFill="False" DockPanel.Dock="Top" Margin="{StaticResource TitleMargin}">
+			<!-- Кнопка возврата назад -->
+			<Button DockPanel.Dock="Left" Command="{Binding GameDeselectedCommand}" VerticalAlignment="Center">
+				<Button.Template>
+					<ControlTemplate TargetType="Button">
+						<Border>
+							<StackPanel Orientation="Horizontal">
+								<Canvas Height="20" Width="17" Margin="0,12,20,5" >
+									<Image x:Name="PART_Image"
+										   Canvas.Left="6"
+										   Canvas.Bottom="0"
+										   Height="{TemplateBinding Height}"
+										   Width="11"
+										   Stretch="Uniform"
+										   Source="/LaserWar;component/Images/back.png" />
+								</Canvas>
+							
+								<Label Content="{Binding ViewModel.name, RelativeSource={RelativeSource AncestorType=local:GameView}}" Margin="0,0,0,0" Style="{StaticResource TitleStyle}" />
+							</StackPanel>
+						</Border>
+										
+						<ControlTemplate.Triggers>
+							<EventTrigger RoutedEvent="Mouse.MouseEnter">
+								<EventTrigger.Actions>
+									<BeginStoryboard>
+										<Storyboard>
+											<!-- Анимация отпрыгивания -->
+											<DoubleAnimationUsingKeyFrames Storyboard.TargetName="PART_Image"
+																		   Storyboard.TargetProperty="(Canvas.Left)"
+																		   AutoReverse="False"
+																		   RepeatBehavior="1x">
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.0" Value="0" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.05" Value="0" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.15" Value="6" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.30" Value="3" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.40" Value="6" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.50" Value="4.2" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.70" Value="6" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.80" Value="5.1" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.90" Value="6" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.95" Value="5.58" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.97" Value="6" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:0.99" Value="5.82" />
+												<DiscreteDoubleKeyFrame KeyTime="0:0:1.0" Value="6" />
+											</DoubleAnimationUsingKeyFrames>
+										</Storyboard>
+									</BeginStoryboard>
+								</EventTrigger.Actions>
+							</EventTrigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Button.Template>
+			</Button>
+												
+			<Button DockPanel.Dock="Right"
+					Content="{Loc resToVk}"
+					Width="200"
+					Margin="0,5,5,5"
+					Style="{StaticResource ButtonStyle}"
+					Click="btnToVk_Click" />
+			<Button DockPanel.Dock="Right"
+					Content="{Loc resToPDF}"
+					Width="200"
+					HorizontalAlignment="Right"
+					Margin="0,5,10,5"
+					Style="{StaticResource ButtonStyle1}"
+					Click="btnToPDF_Click" />
+		</DockPanel>
+				
+		<DataGrid Name="dgrdPlayers"
+				  SelectionMode="Single"
+				  ItemsSource="{Binding Source={StaticResource vsrcPlayers}}"
+				  VerticalAlignment="Top"
+				  AutoGenerateColumns="False"
+				  EnableRowVirtualization="True"
+				  VirtualizingStackPanel.VirtualizationMode="Standard"
+				  VirtualizingStackPanel.IsVirtualizing="True"
+				  CanUserReorderColumns="False"
+				  CanUserResizeRows="False"
+				  CanUserSortColumns="False"
+				  CanUserResizeColumns="False"
+				  CanUserAddRows="False"
+				  CanUserDeleteRows="False"
+				  Height="500"
+				  MaxWidth="900"
+				  RowHeight="50"
+				  IsReadOnly="True"
+				  BorderThickness="{StaticResource TextBoxBorderThickness}"
+				  BorderBrush="{StaticResource TextboxEnabledBorderBrush}"
+				  ScrollViewer.CanContentScroll="False" 
+				  ScrollViewer.VerticalScrollBarVisibility="Auto"
+				  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+				  FontSize="{StaticResource TextboxFontSize}"
+				  FontFamily="{StaticResource TextFont}"
+				  HorizontalGridLinesBrush="Transparent"
+				  VerticalGridLinesBrush="Transparent"
+				  Background="Transparent">
+			<DataGrid.Resources>
+				<Style TargetType="ScrollBar" BasedOn="{StaticResource VerticalScrollBarStyle}" />
+			</DataGrid.Resources>
+			
+			<DataGrid.ColumnHeaderStyle>
+				<Style TargetType="DataGridColumnHeader" >
+					<Setter Property="Template">
+						<Setter.Value>
+							<ControlTemplate TargetType="DataGridColumnHeader" >
+								<ContentPresenter />
+							</ControlTemplate>
+						</Setter.Value>
+					</Setter>
+				</Style>
+			</DataGrid.ColumnHeaderStyle>
+									
+			<DataGrid.CellStyle>
+				<Style TargetType="{x:Type DataGridCell}">
+					<Setter Property="BorderThickness" Value="0" />
+					<Setter Property="Background" Value="Transparent" />
+					<Setter Property="VerticalAlignment" Value="Bottom" />
+					<Setter Property="Margin" Value="0,0,5,2" />
+					<Style.Triggers>
+						<Trigger Property="IsSelected" Value="true">
+							<!-- Выделять строки нам не нужно -->
+							<Setter Property="Background" Value="Transparent" />
+						</Trigger>
+					</Style.Triggers>
+				</Style>
+			</DataGrid.CellStyle>
+			
+			<DataGrid.RowStyle>
+				<Style TargetType="{x:Type DataGridRow}">
+					<Setter Property="BorderBrush" Value="{StaticResource RowBordersBrush}" />
+					<Setter Property="BorderThickness" Value="0,0,0,1" />
+					<Setter Property="Template">
+						<Setter.Value>
+							<ControlTemplate TargetType="{x:Type DataGridRow}">
+								<Border x:Name="DGR_Border"
+										BorderBrush="{TemplateBinding BorderBrush}"
+										BorderThickness="{TemplateBinding BorderThickness}"
+										Background="{TemplateBinding Background}"
+										Height="{TemplateBinding Height}"
+										SnapsToDevicePixels="True">
+									<SelectiveScrollingGrid>
+										<SelectiveScrollingGrid.ColumnDefinitions>
+											<ColumnDefinition Width="Auto" />
+										</SelectiveScrollingGrid.ColumnDefinitions>
+							
+										<SelectiveScrollingGrid.RowDefinitions>
+											<RowDefinition Height="*" />
+											<RowDefinition Height="Auto" />
+										</SelectiveScrollingGrid.RowDefinitions>
+							
+										<DataGridCellsPresenter Grid.Row="0"
+																Grid.Column="0"
+																ItemsPanel="{TemplateBinding ItemsPanel}"
+																SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+							
+										<DataGridDetailsPresenter Grid.Row="2" Grid.Column="0" Visibility="Collapsed" />
+									</SelectiveScrollingGrid>
+									
+									<Border.InputBindings>
+										<MouseBinding Gesture="LeftDoubleClick"
+													  Command="{Binding EditCommand}"
+													  CommandParameter="{x:Static stuff:enEditedPlayerField.All}" />
+									</Border.InputBindings>
+								</Border>
+							</ControlTemplate>
+						</Setter.Value>
+					</Setter>
+				</Style>
+			</DataGrid.RowStyle>
+			
+			<DataGrid.GroupStyle>
+				<GroupStyle>
+					<GroupStyle.ContainerStyle>
+						<Style TargetType="GroupItem">
+							<Setter Property="Template">
+								<Setter.Value>
+									<ControlTemplate TargetType="GroupItem">
+										<Expander IsExpanded="True"
+												  Margin="0,20,0,5"
+												  Template="{StaticResource GroupExpanderTemplate}"
+												  Header="{Binding Items[0].TeamName}" >
+      											<ItemsPresenter Margin="0,5,0,20"/>
+										</Expander>
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</GroupStyle.ContainerStyle>
+				</GroupStyle>
+			</DataGrid.GroupStyle>
+			
+			<DataGrid.Columns>
+				<!-- Игрок -->
+				<DataGridTextColumn Binding="{Binding name}"
+									ElementStyle="{StaticResource OutputTextBlockStyle}"
+									Width="200" >
+					<DataGridTextColumn.Header>
+						<Button Content="{Loc resPlayer}"
+								Style="{StaticResource MyColumnHeaderStyle}"
+								DataContext="{Binding SortTasks[0],
+											RelativeSource={RelativeSource AncestorType=local:GameView}}" />
+					</DataGridTextColumn.Header>
+				</DataGridTextColumn>
+				
+				<!-- Рейтинг -->
+				<DataGridTextColumn Binding="{Binding rating}"
+									ElementStyle="{StaticResource OutputTextBlockStyle}"
+									Width="170" >
+					<DataGridTextColumn.Header>
+						<Button Content="{Loc resRating}"
+								Style="{StaticResource MyColumnHeaderStyle}"
+								DataContext="{Binding SortTasks[1],
+											RelativeSource={RelativeSource AncestorType=local:GameView}}" />
+					</DataGridTextColumn.Header>
+				</DataGridTextColumn>
+				
+				<!-- Точность -->
+				<DataGridTextColumn Binding="{Binding accuracy, Converter={convs:AccuracyMarkupConverter}}"
+									ElementStyle="{StaticResource OutputTextBlockStyle}"
+									Width="170" >
+					<DataGridTextColumn.Header>
+						<Button Content="{Loc resAccuracy}" 
+								Style="{StaticResource MyColumnHeaderStyle}"
+								DataContext="{Binding SortTasks[2],
+											RelativeSource={RelativeSource AncestorType=local:GameView}}" />
+					</DataGridTextColumn.Header>
+				</DataGridTextColumn>
+				
+				<!-- Выстрелы -->
+				<DataGridTextColumn Binding="{Binding shots}"
+									ElementStyle="{StaticResource OutputTextBlockStyle}"
+									Width="170" >
+					<DataGridTextColumn.Header>
+						<Button Content="{Loc resShots}"
+								Style="{StaticResource MyColumnHeaderStyle}"
+								DataContext="{Binding SortTasks[3],
+											RelativeSource={RelativeSource AncestorType=local:GameView}}" />
+					</DataGridTextColumn.Header>
+				</DataGridTextColumn>
+			</DataGrid.Columns>
+		</DataGrid>
+    </DockPanel>
+</glob:CNotifyPropertyChangedUserCtrl>

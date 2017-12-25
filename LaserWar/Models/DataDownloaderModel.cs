@@ -10,6 +10,14 @@ using Newtonsoft.Json;
 using LaserWar.Stuff;
 using LaserWar.Entities;
 using System.Data.Entity;
+using System.Xml.Serialization;
+using System.Xml;
+using LaserWar.Stuff.XMLDataClasses;
+using System.Threading.Tasks;
+using System.Windows.Threading;
+using System.Windows;
+
+
 
 namespace LaserWar.Models
 {
@@ -20,6 +28,7 @@ namespace LaserWar.Models
 	{
 		WebClient m_wc = null;
 		readonly EntitiesContext m_DBContext = null;
+				
 
 		#region События
 		public event EventHandler DownloadStarted;
@@ -171,34 +180,113 @@ namespace LaserWar.Models
 		{
 			Exception err = e.Error;
 			if (err == null)
-			{	// JSON объект успешно загружен
-				try
-				{
-					TaskJSONObject LoadedObject = JsonConvert.DeserializeObject<TaskJSONObject>(e.Result);
-										
-					// Пишем объект в БД, предварительно очистив её
-					m_DBContext.sounds.RemoveRange(m_DBContext.sounds);
-					m_DBContext.SaveChanges(false);
+			{	// JSON объект успешно загружен => выполняем дальнейшие работы в другом потоке, чтобы приложение не зависало
+				Task.Factory.StartNew(HandleJSONObject, e.Result);
+			}
+			else
+				OnDownloadComletedInternal(new DataDownloadComletedEventArgs(err, TaskUrl));
+		}
 
-					foreach (sound jsonSound in LoadedObject.sounds)
-						m_DBContext.sounds.Add(jsonSound);
-					m_DBContext.SaveChanges();
 
-					// Красиво форматируем текст
-					JSONText = JsonConvert.SerializeObject(LoadedObject, Formatting.Indented);
-				}
-				catch (Exception ex)
+		/// <summary>
+		/// Обработка считанного JSON объекта
+		/// </summary>
+		/// <returns>
+		/// Исключение, если оно произошло
+		/// </returns>
+		void HandleJSONObject(object JSONObjectInString)
+		{
+			Exception err = null;
+
+			try
+			{
+				TaskJSONObject LoadedObject = JsonConvert.DeserializeObject<TaskJSONObject>(JSONObjectInString as string);
+
+				// Пишем объект в БД, предварительно очистив её
+				m_DBContext.ClearDBData();
+					
+				// Загружаем звуки в БД
+				foreach (sound jsonSound in LoadedObject.sounds)
 				{
-					err = ex;
-					ex.ToString();
+					jsonSound.Context = m_DBContext;
+					m_DBContext.sounds.Add(jsonSound);
 				}
+				m_DBContext.SaveChanges();
+				m_DBContext.sounds.Load();
+								
+				// Загружаем игры
+				foreach (JSONGame GameInJSON in LoadedObject.games)
+				{
+					using (XmlReader reader = XmlReader.Create(GameInJSON.url))
+					{
+						try
+						{
+							XmlSerializer ser = new XmlSerializer(typeof(GameXML));
+
+							// Заносим игру в БД
+							GameXML GameInXML = ser.Deserialize(reader) as GameXML;
+							game GameInDB = (game)GameInXML;
+							GameInDB.Context = m_DBContext;
+							GameInDB.url = GameInJSON.url;
+							m_DBContext.games.Add(GameInDB);
+							
+							m_DBContext.SaveChanges(); // Чтобы получить GameInDB.id_game
+
+							// Заносим команду в БД
+							foreach (TeamXML TeamInXML in GameInXML.teams)
+							{
+								team TeamInDB = (team)TeamInXML;
+								TeamInDB.Context = m_DBContext;
+								TeamInDB.fk_game = GameInDB.id_game;
+								m_DBContext.teams.Add(TeamInDB);
+
+								m_DBContext.SaveChanges(); // Чтобы получить TeamInDB.id_team
+
+								// Заносим игроков в БД
+								foreach (player PlayerInDB in TeamInXML.players)
+								{
+									PlayerInDB.Context = m_DBContext;
+									PlayerInDB.fk_team = TeamInDB.id_team;
+									m_DBContext.players.Add(PlayerInDB);
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							err = ex;
+						}
+					}
+				}
+				m_DBContext.SaveChanges();
+
+				m_DBContext.players.Load();
+				m_DBContext.teams.Load();
+				m_DBContext.games.Load();
+
+				m_DBContext.DBResseted();
+
+				// Красиво форматируем текст
+				JSONText = JsonConvert.SerializeObject(LoadedObject, Newtonsoft.Json.Formatting.Indented);
+			}
+			catch (Exception ex)
+			{
+				err = ex;
 			}
 
+			Application.Current.Dispatcher.Invoke(new Action(delegate()
+			{
+				OnDownloadComletedInternal(new DataDownloadComletedEventArgs(err, TaskUrl));
+			}));
+		}
+		
+
+		private void OnDownloadComletedInternal(DataDownloadComletedEventArgs e)
+		{
 			m_wc.Dispose();
 			m_wc = null;
 			OnPropertyChanged(CanDownloadPropertyName);
 
-			OnDownloadComleted(new DataDownloadComletedEventArgs(err, TaskUrl));
+			OnDownloadComleted(new DataDownloadComletedEventArgs(e.Error, TaskUrl));
 		}
 	}
 }

@@ -6,6 +6,7 @@ using LaserWar.Global;
 using System.Collections.ObjectModel;
 using LaserWar.Models;
 using LaserWar.Stuff;
+using System.Collections.Specialized;
 
 namespace LaserWar.ViewModels
 {
@@ -38,12 +39,14 @@ namespace LaserWar.ViewModels
 			m_model.PropertyChanged += (s, e) => { OnPropertyChanged(e.PropertyName); };
 			m_model.PlayingStarted += m_model_PlayingStarted;
 			m_model.PlayingFinished += m_model_PlayingFinished;
-			m_model.SoundsReloaded += m_model_SoundsReloaded;
+			((INotifyCollectionChanged)m_model.Sounds).CollectionChanged += m_model_Sounds_CollectionChanged;
 										
 			Sounds = new ReadOnlyObservableCollection<SoundViewModel>(m_Sounds);
 			
 			// Заполняем m_Sounds
-			m_model_SoundsReloaded(this, new EventArgs());
+			// Создаём коллекцию VM'ов на основании уже существующих моделей
+			foreach (SoundModel SoundModel in m_model.Sounds)
+				m_Sounds.Add(new SoundViewModel(SoundModel, this));
 		}
 
 
@@ -57,17 +60,28 @@ namespace LaserWar.ViewModels
 		}
 
 
-		void m_model_SoundsReloaded(object sender, EventArgs e)
+		/// <summary>
+		/// В модели произошли изменения => загружаем их сюда 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		void m_model_Sounds_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
-			m_Sounds.Clear();
-
-			// Создаём коллекцию VM'ов на основании уже существующих моделей
-			foreach (SoundModel SoundModel in m_model.Sounds)
-				m_Sounds.Add(new SoundViewModel(SoundModel, this));
+			if (e.NewItems != null)
+			{
+				foreach (SoundModel snd in e.NewItems)
+				{
+					SoundViewModel CurVal = m_Sounds.FirstOrDefault(arg => snd.Sound.Equals(arg));
+					if (CurVal != null)
+						m_Sounds.Remove(CurVal);
+					m_Sounds.Add(new SoundViewModel(snd, this));
+				}
+			}
 		}
 
 
-		private SoundViewModel GetSound(int SoundId)
+
+		private SoundViewModel GetSound(long SoundId)
 		{
 			return (from snd in Sounds
 					where snd.id_sound == SoundId

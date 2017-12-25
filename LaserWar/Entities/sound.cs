@@ -7,18 +7,26 @@ using LaserWar.Global;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
+using LaserWar.Models;
+using LaserWar.ViewModels;
 
 namespace LaserWar.Entities
 {
-	public class sound : Notifier
+	/// <summary>
+	/// Описание звука в БД
+	/// </summary>
+	[Table("sounds")]
+	public class sound : EntityBase
 	{
 		#region id_sound
 		private static readonly string id_soundPropertyName = GlobalDefines.GetPropertyName<sound>(m => m.id_sound);
 
-		private int m_id_sound = 0;
+		private long m_id_sound = 0;
 
 		[Key]
-		public int id_sound
+		[JsonIgnore]
+		public long id_sound
 		{
 			get { return m_id_sound; }
 			set
@@ -40,6 +48,7 @@ namespace LaserWar.Entities
 		/// <summary>
 		/// Название
 		/// </summary>
+		[Required]
 		public string name
 		{
 			get { return m_name; }
@@ -62,6 +71,7 @@ namespace LaserWar.Entities
 		/// <summary>
 		/// URL для загрузки
 		/// </summary>
+		[Required]
 		public string url
 		{
 			get { return m_url; }
@@ -84,6 +94,7 @@ namespace LaserWar.Entities
 		/// <summary>
 		/// Размер файла в байтах
 		/// </summary>
+		[Required]
 		public int size
 		{
 			get { return m_size; }
@@ -103,7 +114,7 @@ namespace LaserWar.Entities
 		public static readonly string file_pathPropertyName = GlobalDefines.GetPropertyName<sound>(m => m.file_path);
 
 		private string m_file_path = null;
-
+		[JsonIgnore]
 		public string file_path
 		{
 			get { return m_file_path; }
@@ -120,5 +131,30 @@ namespace LaserWar.Entities
 			}
 		}
 		#endregion
+
+
+		public override int GetHashCode()
+		{
+			string[] KeyFields = new string[] { name, size.ToString() };
+			return KeyFields.GetHashCode();
+		}
+
+
+		public override bool Equals(object obj)
+		{
+			if (obj == null)
+				return false;
+
+			if (obj is sound)
+				return name == (obj as sound).name && size == (obj as sound).size;
+
+			if (obj is SoundModel)
+				return name == (obj as SoundModel).Sound.name && size == (obj as SoundModel).Sound.size;
+
+			if (obj is SoundViewModel)
+				return name == (obj as SoundViewModel).name && size == (obj as SoundViewModel).size;
+
+			return false;
+		}
 	}
 }

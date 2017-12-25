@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace LaserWar.Global
 {
@@ -141,6 +142,45 @@ namespace LaserWar.Global
 						((tbctrl.Items[tabIndex] as TabItem).Content as FrameworkElement).Height = MaxHeight;
 					}
 				}
+		}
+
+
+		/// <summary>
+		/// Processes all UI messages currently in the message queue.
+		/// Замена Application.DoEvents().
+		/// Код взят отсюда: http://social.msdn.microsoft.com/Forums/ru-RU/79598b96-1d41-4cbd-8c62-80b12af7a17b/-applicationdoevents-wpf?forum=fordesktopru
+		/// </summary>
+		public static void DoEvents(Window wnd)
+		{
+			if (wnd == null)
+				return;
+
+			// Create new nested message pump.
+			DispatcherFrame nestedFrame = new DispatcherFrame();
+
+			// Dispatch a callback to the current message queue, when getting called,
+			// this callback will end the nested message loop.
+			// note that the priority of this callback should be lower than that of UI event messages.
+			DispatcherOperation exitOperation = wnd.Dispatcher.BeginInvoke(
+				DispatcherPriority.Background, new DispatcherOperationCallback(ExitFrame), nestedFrame);
+
+			// pump the nested message loop, the nested message loop will immediately
+			// process the messages left inside the message queue.
+			Dispatcher.PushFrame(nestedFrame);
+
+			// If the "exitFrame" callback is not finished, abort it.
+			if (exitOperation.Status != DispatcherOperationStatus.Completed)
+				exitOperation.Abort();
+		}
+
+
+		static object ExitFrame(object state)
+		{
+			DispatcherFrame frame = state as DispatcherFrame;
+
+			// Exit the nested message loop.
+			frame.Continue = false;
+			return null;
 		}
 	}
 }

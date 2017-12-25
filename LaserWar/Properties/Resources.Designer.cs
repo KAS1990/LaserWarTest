@@ -61,11 +61,38 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Точность.
+        /// </summary>
+        internal static string resAccuracy {
+            get {
+                return ResourceManager.GetString("resAccuracy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Точность должна быть в диапазоне от 0% до 100%.
+        /// </summary>
+        internal static string resAccuracyMustBeFrom0To1 {
+            get {
+                return ResourceManager.GetString("resAccuracyMustBeFrom0To1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to B.
         /// </summary>
         internal static string resB {
             get {
                 return ResourceManager.GetString("resB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Отменить.
+        /// </summary>
+        internal static string resCancel {
+            get {
+                return ResourceManager.GetString("resCancel", resourceCulture);
             }
         }
         
@@ -93,6 +120,15 @@ namespace LaserWar.Properties {
         internal static string resDownloading {
             get {
                 return ResourceManager.GetString("resDownloading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Редактирование игрока.
+        /// </summary>
+        internal static string resEditPlayer {
+            get {
+                return ResourceManager.GetString("resEditPlayer", resourceCulture);
             }
         }
         
@@ -152,6 +188,33 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Дата проведения.
+        /// </summary>
+        internal static string resGameDate {
+            get {
+                return ResourceManager.GetString("resGameDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Название игры.
+        /// </summary>
+        internal static string resGameName {
+            get {
+                return ResourceManager.GetString("resGameName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Игры.
+        /// </summary>
+        internal static string resGames {
+            get {
+                return ResourceManager.GetString("resGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to JSON объект.
         /// </summary>
         internal static string resJsonObject {
@@ -206,11 +269,101 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Поле &quot;Имя игрока&quot; не должно быть пустым.
+        /// </summary>
+        internal static string resNameCouldNotBeEmpty {
+            get {
+                return ResourceManager.GetString("resNameCouldNotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to %.
+        /// </summary>
+        internal static string resPercent {
+            get {
+                return ResourceManager.GetString("resPercent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Игрок.
+        /// </summary>
+        internal static string resPlayer {
+            get {
+                return ResourceManager.GetString("resPlayer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Имя игрока.
+        /// </summary>
+        internal static string resPlayerName {
+            get {
+                return ResourceManager.GetString("resPlayerName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Количество игроков.
+        /// </summary>
+        internal static string resPlayersCount {
+            get {
+                return ResourceManager.GetString("resPlayersCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Воспроизвести.
         /// </summary>
         internal static string resPlayFile {
             get {
                 return ResourceManager.GetString("resPlayFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Рейтинг.
+        /// </summary>
+        internal static string resRating {
+            get {
+                return ResourceManager.GetString("resRating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Рейтинг должен быть положительным числом.
+        /// </summary>
+        internal static string resRatingMustBeNotNegative {
+            get {
+                return ResourceManager.GetString("resRatingMustBeNotNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Сохранить.
+        /// </summary>
+        internal static string resSave {
+            get {
+                return ResourceManager.GetString("resSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Выстрелы.
+        /// </summary>
+        internal static string resShots {
+            get {
+                return ResourceManager.GetString("resShots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Число выстрелов не должно быть отрицательным.
+        /// </summary>
+        internal static string resShotsMustBeNotNegative {
+            get {
+                return ResourceManager.GetString("resShotsMustBeNotNegative", resourceCulture);
             }
         }
         
@@ -229,6 +382,24 @@ namespace LaserWar.Properties {
         internal static string resSounds {
             get {
                 return ResourceManager.GetString("resSounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Сохранить как PDF.
+        /// </summary>
+        internal static string resToPDF {
+            get {
+                return ResourceManager.GetString("resToPDF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Опубликовать в ВК.
+        /// </summary>
+        internal static string resToVk {
+            get {
+                return ResourceManager.GetString("resToVk", resourceCulture);
             }
         }
         

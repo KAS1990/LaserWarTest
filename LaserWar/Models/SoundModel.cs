@@ -39,7 +39,7 @@ namespace LaserWar.Models
 		#region Sound
 		private static readonly string SoundPropertyName = GlobalDefines.GetPropertyName<SoundModel>(m => m.Sound);
 
-		readonly int m_SoundId = 0;
+		readonly long m_SoundId = 0;
 		sound m_Sound = null;
 		public sound Sound
 		{
@@ -219,23 +219,13 @@ namespace LaserWar.Models
 			m_FileDowloader.DownloadProgressChanged += FileDowloader_DownloadProgressChanged;
 		}
 
-
-		public void UpdateSoundInDB(sound NewValue)
+				
+		/// <summary>
+		/// Переписать данные из БД в объект
+		/// </summary>
+		public void UpdateFromDB()
 		{
-			sound CurValue = Sound;
-			try
-			{
-				CurValue = NewValue;
-				m_Parent.DBContext.Entry(CurValue).State = System.Data.Entity.EntityState.Modified;
-				m_Parent.DBContext.SaveChanges();
-			}
-			catch (Exception ex)
-			{
-				ex.ToString();
-				return;
-			}
-
-			Sound = CurValue;
+			Sound = GetSound();
 
 			OnSoundUpdated(new string[] { SoundPropertyName, FileNamePropertyName, IsDownloadedPropertyName, CanPlayPropertyName });
 		}
@@ -291,7 +281,8 @@ namespace LaserWar.Models
 				Sound.file_path = m_FileDowloader.QueryString[sound.file_pathPropertyName];
 				DownloadProgressPercent = 100;
 
-				UpdateSoundInDB(Sound);
+				Sound.ToDB();
+				OnSoundUpdated(new string[] { SoundPropertyName, FileNamePropertyName, IsDownloadedPropertyName, CanPlayPropertyName });
 			}
 
 			m_FileDowloader.QueryString.Clear();
