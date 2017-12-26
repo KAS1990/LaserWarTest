@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\Саша\Saves\Програмирование\LaserWar\obj\x86\Debug\
+D:\Саша\Saves\Програмирование\LaserWarTest\LaserWar\obj\x86\Debug\
 LaserWar
 none
 false
 DEBUG;TRACE
-D:\Саша\Saves\Програмирование\LaserWar\LaserWarApp.xaml
-51196430451
+D:\Саша\Saves\Програмирование\LaserWarTest\LaserWar\LaserWarApp.xaml
+102077820821
 
-272092984004
-33-1395938085
-MainWindow.xaml;Stuff\MessageWnd.xaml;Templates\CommonControlsTemplates.xaml;Templates\CommonResources.xaml;Veiws\DataDownloaderView.xaml;
+58724310369
+26-654020080
+ExtraControls\DialogWnds\MessageDialog.xaml;ExtraControls\DialogWnds\PlayerSettingsDialog.xaml;ExtraControls\ProgressShape.xaml;MainWindow.xaml;Templates\CommonControlsTemplates.xaml;Templates\CommonResources.xaml;Views\DataDownloaderView.xaml;Views\GamesView.xaml;Views\GameView.xaml;Views\SoundsView.xaml;
 
 False
 

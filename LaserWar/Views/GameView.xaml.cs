@@ -24,6 +24,8 @@ using System.Globalization;
 using iTextSharp.text.pdf;
 using System.IO;
 using iTextSharp.text;
+using iTextSharp.awt.geom;
+using System.Threading.Tasks;
 
 namespace LaserWar.Views
 {
@@ -198,269 +200,279 @@ namespace LaserWar.Views
 
 			bool? res = dlg.ShowDialog();
 			if (res.HasValue && res.Value)
-			{
-				try
-				{
-					using (FileStream fs = new FileStream(dlg.FileName, FileMode.Create, FileAccess.Write, FileShare.None))
-					{
-						Document Doc = new Document();
-						PdfWriter writer = PdfWriter.GetInstance(Doc, fs);
-						Doc.Open();
-						PdfContentByte canvas = writer.DirectContent;
-						Doc.SetPageSize(PageSize.A4);
-						Doc.SetMargins(40, 40, 40, 40);
-						Doc.AddCreator(Environment.UserName);
-
-						// Название игры
-						BaseFont baseFont = BaseFont.CreateFont("Arial Cyr.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-						iTextSharp.text.Paragraph para = new iTextSharp.text.Paragraph(new Phrase(m_ViewModel.name + "  " + m_ViewModel.date.ToString(),
-																						new Font(baseFont, 30, Font.BOLD)))
-						{
-							Alignment = Element.ALIGN_LEFT,
-						};
-						Doc.Add(para);
-
-						// Таблица с игроками
-						Font HeaderFont = new Font(baseFont, 10, Font.BOLD);
-						PdfPTable Table = new PdfPTable(new float[] { 1.2f, 1, 1, 1 })
-						{
-							SpacingBefore = 10,
-							SpacingAfter = 20,
-							PaddingTop = 10,
-							HeaderRows = 1,
-							HorizontalAlignment = Element.ALIGN_JUSTIFIED,
-							WidthPercentage = 100,
-						};
-						Table.DefaultCell.UseVariableBorders = true;
-						Table.DefaultCell.BorderWidthBottom = 2;
-						Table.DefaultCell.BorderColorBottom = new BaseColor(System.Drawing.Color.FromArgb(255, 240, 240, 240));
-						Table.DefaultCell.BorderWidthLeft = 0;
-						Table.DefaultCell.BorderWidthRight = 0;
-						Table.DefaultCell.BorderWidthTop = 0;
-						Table.DefaultCell.HorizontalAlignment = Element.ALIGN_LEFT;
-						Table.DefaultCell.PaddingTop = 10;
-						Table.DefaultCell.PaddingBottom = 5;
-
-						// Заголовок таблицы
-						PdfPCell Cell = new PdfPCell(Table.DefaultCell)
-						{
-							Phrase = new Phrase(Properties.Resources.resPlayerName, HeaderFont),
-							Border = PdfPCell.NO_BORDER,
-							PaddingTop = 20
-						};
-						Table.AddCell(Cell);
-						Cell = new PdfPCell(Table.DefaultCell)
-						{
-							Phrase = new Phrase(Properties.Resources.resPlayerName, HeaderFont),
-							Border = PdfPCell.NO_BORDER,
-							PaddingTop = 20
-						};
-						Table.AddCell(Cell);
-						Cell = new PdfPCell(Table.DefaultCell)
-						{
-							Phrase = new Phrase(Properties.Resources.resRating, HeaderFont),
-							Border = PdfPCell.NO_BORDER,
-							PaddingTop = 20
-						};
-						Table.AddCell(Cell);
-						Cell = new PdfPCell(Table.DefaultCell)
-						{
-							Phrase = new Phrase(Properties.Resources.resShots, HeaderFont),
-							Border = PdfPCell.NO_BORDER,
-							PaddingTop = 20
-						};
-						Table.AddCell(Cell);
-
-						// Формируем список участников
-						IEnumerable<PlayerViewModel> PlayersForPDF = m_ViewModel.Players;
-						if (SortTasks.SelectedItem != null)
-						{	// Оставляем ту сортировку, которая сейчас выбрана на форме
-							PlayersSorter Sorter = new PlayersSorter(SortTasks.SelectedItem.ID, SortTasks.SelectedItem.Direction);
-							PlayersForPDF = PlayersForPDF.OrderBy(arg => arg, Sorter);
-						}
-
-						// Заполняем таблицу
-						Font TeamNameFont = new Font(baseFont, 16, Font.BOLD);
-						Font StandartFont = new Font(baseFont, 10);
-						long TeamId = -1;
-						AccuracyMarkupConverter convAccuracy = new AccuracyMarkupConverter();
-						foreach (PlayerViewModel player in PlayersForPDF)
-						{
-							if (player.TeamId != TeamId)
-							{	// Добавляем строку с командой
-								Cell = new PdfPCell(Table.DefaultCell)
-								{
-									Phrase = new Phrase(player.TeamName, TeamNameFont),
-									Colspan = 4,
-									Border = PdfPCell.NO_BORDER,
-									PaddingTop = 15,
-								};
-								Table.AddCell(Cell);
-								TeamId = player.TeamId;
-							}
-
-							Cell = new PdfPCell(Table.DefaultCell)
-							{
-								Phrase = new Phrase(player.name, StandartFont),
-							};
-							Table.AddCell(Cell);
-							Cell = new PdfPCell(Table.DefaultCell)
-							{
-								Phrase = new Phrase(player.rating.ToString(), StandartFont),
-							};
-							Table.AddCell(Cell);
-							Cell = new PdfPCell(Table.DefaultCell)
-							{
-								Phrase = new Phrase(convAccuracy.Convert(player.accuracy, typeof(string), null, CultureInfo.CurrentCulture) as string, StandartFont),
-							};
-							Table.AddCell(Cell);
-							Cell = new PdfPCell(Table.DefaultCell)
-							{
-								Phrase = new Phrase(player.shots.ToString(), StandartFont),
-							};
-							Table.AddCell(Cell);
-						}
-						Doc.Add(Table);
-
-						// Статистика по командам
-						Table = new PdfPTable(new float[] { 1, 1 })
-						{
-							SpacingBefore = 10,
-							PaddingTop = 10,
-							HorizontalAlignment = Element.ALIGN_JUSTIFIED,
-							WidthPercentage = 100,
-						};
-						Table.DefaultCell.Border = PdfPCell.NO_BORDER;
-						
-						int MaxRating = m_ViewModel.Teams.Max(arg => arg.Rating);
-
-						// Формируем список команд
-						IEnumerable<TeamViewModel> TeamsForPDF = m_ViewModel.Teams.OrderBy(arg => arg.id_team);
-						BaseColor BarColor = new BaseColor(System.Drawing.Color.FromArgb(255, 0, 90, 255));
-						int TeamNumber = -1;
-						foreach (TeamViewModel team in TeamsForPDF)
-						{
-							TeamNumber++;
-
-							PdfPTable TableTeam = new PdfPTable(new float[] { 1, 1 })
-							{
-								WidthPercentage = 95,
-								HorizontalAlignment = TeamNumber % 2 == 0 ? Element.ALIGN_LEFT : Element.ALIGN_RIGHT,
-							};
-
-							// Название команды
-							Cell = new PdfPCell(Table.DefaultCell)
-							{
-								Phrase = new Phrase(team.name, TeamNameFont),
-								HorizontalAlignment = Element.ALIGN_LEFT,
-								PaddingTop = 25,
-								PaddingBottom = 0,
-								Colspan = 2,
-							};
-							TableTeam.AddCell(Cell);
-							
-							// Рейтинг
-							Cell = new PdfPCell(Table.DefaultCell)
-							{
-								Phrase = new Phrase(Properties.Resources.resRating, HeaderFont),
-								HorizontalAlignment = Element.ALIGN_LEFT,
-								PaddingTop = 20,
-								PaddingBottom = 5,
-							};
-							TableTeam.AddCell(Cell);
-							Cell = new PdfPCell(Table.DefaultCell)
-							{
-								Phrase = new Phrase(team.Rating.ToString("F0"), HeaderFont),
-								HorizontalAlignment = Element.ALIGN_RIGHT,
-								PaddingTop = 20,
-								PaddingBottom = 3,
-							};
-							TableTeam.AddCell(Cell);
-
-							// Синий прямоугольник
-							float BarWidth = ((float)team.Rating / MaxRating) * (Doc.PageSize.Width - Doc.RightMargin - Doc.LeftMargin) * 0.5f * (TableTeam.WidthPercentage - 1) / 100.0f;
-							PdfTemplate template = canvas.CreateTemplate(BarWidth, 10);
-							template.SetColorFill(BarColor);
-							template.Rectangle(0, 0, BarWidth, 10);
-							template.Fill();
-							writer.ReleaseTemplate(template);
-							Cell = new PdfPCell(iTextSharp.text.Image.GetInstance(template))
-							{
-								PaddingTop = 0,
-								PaddingBottom = 0,
-								BorderWidth = 2,
-								BorderColor = BarColor,
-								FixedHeight = 10,
-								Colspan = 2,
-							};
-							TableTeam.AddCell(Cell);
-
-							// Точность
-							Cell = new PdfPCell(Table.DefaultCell)
-							{
-								Phrase = new Phrase(Properties.Resources.resAccuracy, HeaderFont),
-								HorizontalAlignment = Element.ALIGN_LEFT,
-								PaddingTop = 20,
-								PaddingBottom = 5,
-							};
-							TableTeam.AddCell(Cell);
-							Cell = new PdfPCell(Table.DefaultCell)
-							{
-								Phrase = new Phrase(convAccuracy.Convert(team.Accuracy, typeof(string), null, CultureInfo.CurrentCulture) as string, HeaderFont),
-								HorizontalAlignment = Element.ALIGN_RIGHT,
-								PaddingTop = 20,
-								PaddingBottom = 3,
-							};
-							TableTeam.AddCell(Cell);
-
-							// Синий прямоугольник
-							BarWidth = team.Accuracy * (Doc.PageSize.Width - Doc.RightMargin - Doc.LeftMargin) * 0.5f * (TableTeam.WidthPercentage - 1) / 100.0f;
-							template = canvas.CreateTemplate(BarWidth, 10);
-							template.SetColorFill(BarColor);
-							template.Rectangle(0, 0, BarWidth, 10);
-							template.Fill();
-							writer.ReleaseTemplate(template);
-							Cell = new PdfPCell(iTextSharp.text.Image.GetInstance(template))
-							{
-								PaddingTop = 0,
-								PaddingBottom = 0,
-								BorderWidth = 2,
-								BorderColor = BarColor,
-								FixedHeight = 10,
-								Colspan = 2,
-							};
-							TableTeam.AddCell(Cell);
-
-							Cell = new PdfPCell(Table.DefaultCell);
-							Cell.AddElement(TableTeam);
-							Table.AddCell(Cell);
-						}
-						Table.CompleteRow(); // Без этого при нечётном количестве строк не будет выведена последняя строка
-						Doc.Add(Table);
-																		
-						Doc.Close();
-						writer.Close();
-
-						MessageDialog msg = new MessageDialog(LaserWarApp.MainWnd.brdShadow)
-						{
-							Title = Properties.Resources.resInformation,
-							Message = string.Format(Properties.Resources.resfmtPDFFileSavedSuccessfully, dlg.FileName)
-						};
-						msg.ButtonClicked += msg_ButtonClicked;
-					}
-				}
-				catch (Exception ex)
-				{
-					MessageDialog msg = new MessageDialog(LaserWarApp.MainWnd.brdShadow)
-					{
-						Title = Properties.Resources.resErrorOccured,
-						Message = string.Format(Properties.Resources.resfmtPDFFileDontSaved, dlg.FileName)
-					};
-					msg.ButtonClicked += msg_ButtonClicked;
-				}
+			{	// Создаём PDF в другом потоке
+				Task.Factory.StartNew(WriteDataToPDF, dlg.FileName);
 			}
 			else
 				LaserWarApp.MainWnd.ShowShadow = LaserWarApp.MainWnd.ShowProgressShape = false;
+		}
+
+
+		private void WriteDataToPDF(object FileName)
+		{
+			try
+			{
+				using (FileStream fs = new FileStream(FileName.ToString(), FileMode.Create, FileAccess.Write, FileShare.None))
+				{
+					Document Doc = new Document(PageSize.A4, 30, 30, 30, 30);
+					PdfWriter writer = PdfWriter.GetInstance(Doc, fs);
+					Doc.Open();
+					PdfContentByte canvas = writer.DirectContent;
+					Doc.AddCreator(Environment.UserName);
+
+					// Название игры
+					BaseFont baseFont = BaseFont.CreateFont("Arial Cyr.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+					iTextSharp.text.Paragraph para = new iTextSharp.text.Paragraph(new Phrase(m_ViewModel.name + "  " + m_ViewModel.date.ToString(),
+																					new Font(baseFont, 30, Font.BOLD)))
+					{
+						Alignment = Element.ALIGN_LEFT,
+					};
+					Doc.Add(para);
+
+					// Таблица с игроками
+					Font HeaderFont = new Font(baseFont, 10, Font.BOLD);
+					PdfPTable Table = new PdfPTable(new float[] { 1.2f, 1, 1, 1 })
+					{
+						SpacingBefore = 10,
+						SpacingAfter = 20,
+						PaddingTop = 10,
+						HeaderRows = 1,
+						HorizontalAlignment = Element.ALIGN_JUSTIFIED,
+						WidthPercentage = 100,
+					};
+					Table.DefaultCell.UseVariableBorders = true;
+					Table.DefaultCell.BorderWidthBottom = 2;
+					Table.DefaultCell.BorderColorBottom = new BaseColor(System.Drawing.Color.FromArgb(255, 240, 240, 240));
+					Table.DefaultCell.BorderWidthLeft = 0;
+					Table.DefaultCell.BorderWidthRight = 0;
+					Table.DefaultCell.BorderWidthTop = 0;
+					Table.DefaultCell.HorizontalAlignment = Element.ALIGN_LEFT;
+					Table.DefaultCell.PaddingTop = 10;
+					Table.DefaultCell.PaddingBottom = 5;
+
+					// Заголовок таблицы
+					PdfPCell Cell = new PdfPCell(Table.DefaultCell)
+					{
+						Phrase = new Phrase(Properties.Resources.resPlayerName, HeaderFont),
+						Border = PdfPCell.NO_BORDER,
+						PaddingTop = 20
+					};
+					Table.AddCell(Cell);
+					Cell = new PdfPCell(Table.DefaultCell)
+					{
+						Phrase = new Phrase(Properties.Resources.resPlayerName, HeaderFont),
+						Border = PdfPCell.NO_BORDER,
+						PaddingTop = 20
+					};
+					Table.AddCell(Cell);
+					Cell = new PdfPCell(Table.DefaultCell)
+					{
+						Phrase = new Phrase(Properties.Resources.resRating, HeaderFont),
+						Border = PdfPCell.NO_BORDER,
+						PaddingTop = 20
+					};
+					Table.AddCell(Cell);
+					Cell = new PdfPCell(Table.DefaultCell)
+					{
+						Phrase = new Phrase(Properties.Resources.resShots, HeaderFont),
+						Border = PdfPCell.NO_BORDER,
+						PaddingTop = 20
+					};
+					Table.AddCell(Cell);
+
+					// Формируем список участников
+					IEnumerable<PlayerViewModel> PlayersForPDF = m_ViewModel.Players;
+					if (SortTasks.SelectedItem != null)
+					{	// Оставляем ту сортировку, которая сейчас выбрана на форме
+						PlayersSorter Sorter = new PlayersSorter(SortTasks.SelectedItem.ID, SortTasks.SelectedItem.Direction);
+						PlayersForPDF = PlayersForPDF.OrderBy(arg => arg, Sorter);
+					}
+
+					// Заполняем таблицу
+					Font TeamNameFont = new Font(baseFont, 16, Font.BOLD);
+					Font StandartFont = new Font(baseFont, 10);
+					long TeamId = -1;
+					AccuracyMarkupConverter convAccuracy = new AccuracyMarkupConverter();
+					foreach (PlayerViewModel player in PlayersForPDF)
+					{
+						if (player.TeamId != TeamId)
+						{	// Добавляем строку с командой
+							Cell = new PdfPCell(Table.DefaultCell)
+							{
+								Phrase = new Phrase(player.TeamName, TeamNameFont),
+								Colspan = 4,
+								Border = PdfPCell.NO_BORDER,
+								PaddingTop = 15,
+							};
+							Table.AddCell(Cell);
+							TeamId = player.TeamId;
+						}
+
+						Cell = new PdfPCell(Table.DefaultCell)
+						{
+							Phrase = new Phrase(player.name, StandartFont),
+						};
+						Table.AddCell(Cell);
+						Cell = new PdfPCell(Table.DefaultCell)
+						{
+							Phrase = new Phrase(player.rating.ToString(), StandartFont),
+						};
+						Table.AddCell(Cell);
+						Cell = new PdfPCell(Table.DefaultCell)
+						{
+							Phrase = new Phrase(convAccuracy.Convert(player.accuracy, typeof(string), null, CultureInfo.CurrentCulture) as string, StandartFont),
+						};
+						Table.AddCell(Cell);
+						Cell = new PdfPCell(Table.DefaultCell)
+						{
+							Phrase = new Phrase(player.shots.ToString(), StandartFont),
+						};
+						Table.AddCell(Cell);
+					}
+					Doc.Add(Table);
+
+					// Статистика по командам
+					Table = new PdfPTable(new float[] { 1, 1 })
+					{
+						SpacingBefore = 10,
+						PaddingTop = 10,
+						HorizontalAlignment = Element.ALIGN_JUSTIFIED,
+						WidthPercentage = 100,
+					};
+					Table.DefaultCell.Border = PdfPCell.NO_BORDER;
+
+					int MaxRating = m_ViewModel.Teams.Max(arg => arg.Rating);
+
+					// Формируем список команд
+					IEnumerable<TeamViewModel> TeamsForPDF = m_ViewModel.Teams.OrderBy(arg => arg.id_team);
+					BaseColor BarColor = new BaseColor(System.Drawing.Color.FromArgb(255, 0, 90, 255));
+					int TeamNumber = -1;
+					foreach (TeamViewModel team in TeamsForPDF)
+					{
+						TeamNumber++;
+
+						PdfPTable TableTeam = new PdfPTable(new float[] { 1, 1 })
+						{
+							WidthPercentage = 95,
+							HorizontalAlignment = TeamNumber % 2 == 0 ? Element.ALIGN_LEFT : Element.ALIGN_RIGHT,
+						};
+
+						// Название команды
+						Cell = new PdfPCell(Table.DefaultCell)
+						{
+							Phrase = new Phrase(team.name, TeamNameFont),
+							HorizontalAlignment = Element.ALIGN_LEFT,
+							PaddingTop = 25,
+							PaddingBottom = 0,
+							Colspan = 2,
+						};
+						TableTeam.AddCell(Cell);
+
+						// Рейтинг
+						Cell = new PdfPCell(Table.DefaultCell)
+						{
+							Phrase = new Phrase(Properties.Resources.resRating, HeaderFont),
+							HorizontalAlignment = Element.ALIGN_LEFT,
+							PaddingTop = 20,
+							PaddingBottom = 5,
+						};
+						TableTeam.AddCell(Cell);
+						Cell = new PdfPCell(Table.DefaultCell)
+						{
+							Phrase = new Phrase(team.Rating.ToString("F0"), HeaderFont),
+							HorizontalAlignment = Element.ALIGN_RIGHT,
+							PaddingTop = 20,
+							PaddingBottom = 3,
+						};
+						TableTeam.AddCell(Cell);
+
+						// Синий прямоугольник
+						float BarWidth = ((float)team.Rating / MaxRating) * (Doc.PageSize.Width - Doc.RightMargin - Doc.LeftMargin) * 0.5f * (TableTeam.WidthPercentage - 1) / 100.0f;
+						PdfTemplate template = canvas.CreateTemplate(BarWidth, 10);
+						template.SetColorFill(BarColor);
+						template.Rectangle(0, 0, BarWidth, 10);
+						template.Fill();
+						writer.ReleaseTemplate(template);
+						Cell = new PdfPCell(iTextSharp.text.Image.GetInstance(template))
+						{
+							PaddingTop = 0,
+							PaddingBottom = 0,
+							BorderWidth = 2,
+							BorderColor = BarColor,
+							FixedHeight = 10,
+							Colspan = 2,
+						};
+						TableTeam.AddCell(Cell);
+
+						// Точность
+						Cell = new PdfPCell(Table.DefaultCell)
+						{
+							Phrase = new Phrase(Properties.Resources.resAccuracy, HeaderFont),
+							HorizontalAlignment = Element.ALIGN_LEFT,
+							PaddingTop = 20,
+							PaddingBottom = 5,
+						};
+						TableTeam.AddCell(Cell);
+						Cell = new PdfPCell(Table.DefaultCell)
+						{
+							Phrase = new Phrase(convAccuracy.Convert(team.Accuracy, typeof(string), null, CultureInfo.CurrentCulture) as string, HeaderFont),
+							HorizontalAlignment = Element.ALIGN_RIGHT,
+							PaddingTop = 20,
+							PaddingBottom = 3,
+						};
+						TableTeam.AddCell(Cell);
+
+						// Синий прямоугольник
+						BarWidth = team.Accuracy * (Doc.PageSize.Width - Doc.RightMargin - Doc.LeftMargin) * 0.5f * (TableTeam.WidthPercentage - 1) / 100.0f;
+						template = canvas.CreateTemplate(BarWidth, 10);
+						template.SetColorFill(BarColor);
+						template.Rectangle(0, 0, BarWidth, 10);
+						template.Fill();
+						writer.ReleaseTemplate(template);
+						Cell = new PdfPCell(iTextSharp.text.Image.GetInstance(template))
+						{
+							PaddingTop = 0,
+							PaddingBottom = 0,
+							BorderWidth = 2,
+							BorderColor = BarColor,
+							FixedHeight = 10,
+							Colspan = 2,
+						};
+						TableTeam.AddCell(Cell);
+
+						Cell = new PdfPCell(Table.DefaultCell);
+						Cell.AddElement(TableTeam);
+						Table.AddCell(Cell);
+					}
+					Table.CompleteRow(); // Без этого при нечётном количестве строк не будет выведена последняя строка
+					Doc.Add(Table);
+
+					Doc.Close();
+					writer.Close();
+
+					Application.Current.Dispatcher.Invoke(new Action(delegate()
+					{	// Это нужно делать в основном потоке
+						MessageDialog msg = new MessageDialog(LaserWarApp.MainWnd.brdShadow)
+						{
+							Title = Properties.Resources.resInformation,
+							Message = string.Format(Properties.Resources.resfmtPDFFileSavedSuccessfully, FileName)
+						};
+						msg.ButtonClicked += msg_ButtonClicked;
+					}));
+				}
+			}
+			catch (Exception ex)
+			{
+				Application.Current.Dispatcher.Invoke(new Action(delegate()
+				{	// Это нужно делать в основном потоке
+					MessageDialog msg = new MessageDialog(LaserWarApp.MainWnd.brdShadow)
+					{
+						Title = Properties.Resources.resErrorOccured,
+						Message = string.Format(Properties.Resources.resfmtPDFFileDontSaved, FileName)
+					};
+					msg.ButtonClicked += msg_ButtonClicked;
+				}));
+			}
 		}
 
 
