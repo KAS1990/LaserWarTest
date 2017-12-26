@@ -20,7 +20,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using LaserWar.Entities;
-using sharpPDF;
 using System.ComponentModel;
 using System.Media;
 using System.Threading;
@@ -212,7 +211,7 @@ namespace LaserWar
 				};
 				dlg.ButtonClicked += (s, ev) => 
 					{
-						(s as MessageDialog).RemoveFromHost();
+						ev.Dlg.RemoveFromHost();
 						ShowShadow = false;
 					};
 			}

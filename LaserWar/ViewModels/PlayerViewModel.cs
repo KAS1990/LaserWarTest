@@ -328,12 +328,15 @@ namespace LaserWar.ViewModels
 			if (m_modelPlayer.Context.Entry(m_modelPlayer).State == System.Data.Entity.EntityState.Detached)
 			{	// Работаем с копией => загружаем оригинал и сохраняем его в БД
 				m_modelPlayer = m_modelPlayer.Context.players.First(x => x.id_player == m_modelPlayer.id_player) as player;
+				m_modelPlayer.Context.Entry(m_modelPlayer).State = System.Data.Entity.EntityState.Unchanged;
 			}
 			
 			if (m_modelTeam.Context.Entry(m_modelTeam).State == System.Data.Entity.EntityState.Detached)
 			{	// Работаем с копией => загружаем оригинал и сохраняем его в БД
 				m_modelTeam = m_modelTeam.Context.teams.First(x => x.id_team == m_modelTeam.id_team) as team;
+				m_modelPlayer.Context.Entry(m_modelTeam).State = System.Data.Entity.EntityState.Unchanged;
 			}
+			
 			OnEditStateChanged(EditingField, enEditedPlayerState.Canceled);
 		}
 

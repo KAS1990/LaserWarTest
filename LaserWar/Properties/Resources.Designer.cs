@@ -188,6 +188,25 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Не удалось сохранить документ PDF
+        ///&quot;{0}&quot;.
+        /// </summary>
+        internal static string resfmtPDFFileDontSaved {
+            get {
+                return ResourceManager.GetString("resfmtPDFFileDontSaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Документ PDF &quot;{0}&quot; успешно сохранён.
+        /// </summary>
+        internal static string resfmtPDFFileSavedSuccessfully {
+            get {
+                return ResourceManager.GetString("resfmtPDFFileSavedSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Дата проведения.
         /// </summary>
         internal static string resGameDate {
@@ -211,6 +230,15 @@ namespace LaserWar.Properties {
         internal static string resGames {
             get {
                 return ResourceManager.GetString("resGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Сообщение.
+        /// </summary>
+        internal static string resInformation {
+            get {
+                return ResourceManager.GetString("resInformation", resourceCulture);
             }
         }
         
@@ -346,6 +374,15 @@ namespace LaserWar.Properties {
         internal static string resSave {
             get {
                 return ResourceManager.GetString("resSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Документы PDF|*.pdf.
+        /// </summary>
+        internal static string resSavePDFFilter {
+            get {
+                return ResourceManager.GetString("resSavePDFFilter", resourceCulture);
             }
         }
         

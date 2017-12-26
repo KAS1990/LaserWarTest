@@ -8,34 +8,47 @@ using LaserWar.ViewModels;
 
 namespace LaserWar.Views
 {
-	public class PlayersSorter : IComparer
+	public class GenericPlayersSorter : IComparer<PlayerViewModel>
 	{
 		public ListSortDirection? Direction { get; set; }
 		public string SortMember { get; set; }
 
-		public PlayersSorter(string sortMember, ListSortDirection? direction)
+
+		public GenericPlayersSorter(string sortMember, ListSortDirection? direction)
 		{
 			SortMember = sortMember;
 			Direction = direction;
 		}
 
-		public int Compare(object x, object y)
-		{
-			var xVm = (PlayerViewModel)x;
-			var yVm = (PlayerViewModel)y;
 
-			if (xVm.TeamId == yVm.TeamId)
-				return CompareBySortMember(xVm, yVm);
-			return xVm.TeamId < yVm.TeamId ? -1 : 1;
+		public int Compare(PlayerViewModel x, PlayerViewModel y)
+		{
+			if (x.TeamId == y.TeamId)
+				return CompareBySortMember(x, y);
+			return x.TeamId < y.TeamId ? -1 : 1;
 		}
 
-		
-		private int CompareBySortMember(PlayerViewModel xVm, PlayerViewModel yVm)
+
+		protected int CompareBySortMember(PlayerViewModel xVm, PlayerViewModel yVm)
 		{
 			var xValue = xVm.GetType().GetProperty(SortMember).GetValue(xVm, null);
 			var yValue = yVm.GetType().GetProperty(SortMember).GetValue(yVm, null);
 			int result = (xValue as IComparable).CompareTo(yValue);
 			return Direction == ListSortDirection.Descending ? result * -1 : result;
+		}
+	}
+
+
+	public class PlayersSorter : GenericPlayersSorter, IComparer
+	{
+		public PlayersSorter(string sortMember, ListSortDirection? direction):
+			base(sortMember, direction)
+		{
+		}
+
+		public int Compare(object x, object y)
+		{
+			return base.Compare((PlayerViewModel)x, (PlayerViewModel)y);
 		}
 	}
 }

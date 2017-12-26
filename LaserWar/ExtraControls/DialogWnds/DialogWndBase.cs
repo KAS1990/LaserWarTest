@@ -38,7 +38,7 @@ namespace LaserWar.ExtraControls.DialogWnds
 		protected void OnButtonClicked(enButtonType ButtonType)
 		{
 			if (ButtonClicked != null)
-				ButtonClicked(this, new ButtonClickedEventArgs(ButtonType));
+				ButtonClicked(this, new ButtonClickedEventArgs(this, ButtonType));
 		}
 
 

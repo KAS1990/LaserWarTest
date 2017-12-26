@@ -37,3 +37,10 @@ LaserWar/LaserWar.suo
 *.cache
 *.wav
 *.cache
+LaserWar/obj/x86/Debug/ExtraControls/DialogWnds/PlayerSettingsDialog.g.cs
+LaserWar/bin/Debug/AngleSharp.dll
+LaserWar/bin/Debug/AngleSharp.dll
+LaserWar/bin/Debug/EntityFramework.dll
+LaserWar/bin/Debug/EntityFramework.dll
+LaserWar/bin/Debug/SQLite.CodeFirst.dll
+LaserWar/bin/Debug/Newtonsoft.Json.dll

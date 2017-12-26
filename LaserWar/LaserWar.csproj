@@ -48,11 +48,12 @@
       <HintPath>packages\EntityFramework.6.1.0\lib\net40\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="itextsharp, Version=5.5.12.0, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>packages\iTextSharp.5.5.12\lib\itextsharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>.\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="sharpPDF">
-      <HintPath>.\sharpPDF.dll</HintPath>
     </Reference>
     <Reference Include="SQLite.CodeFirst, Version=1.4.0.20, Culture=neutral, PublicKeyToken=eb96ba0a78d831a7, processorArchitecture=MSIL">
       <HintPath>packages\SQLite.CodeFirst.1.4.0.20\lib\net40\SQLite.CodeFirst.dll</HintPath>
@@ -238,6 +239,9 @@
     <None Include="LaserWar.db3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Resource Include="Arial Cyr.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

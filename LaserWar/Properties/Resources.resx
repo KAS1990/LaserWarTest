@@ -235,4 +235,17 @@
   <data name="resShotsMustBeNotNegative" xml:space="preserve">
     <value>Число выстрелов не должно быть отрицательным</value>
   </data>
+  <data name="resfmtPDFFileDontSaved" xml:space="preserve">
+    <value>Не удалось сохранить документ PDF
+"{0}"</value>
+  </data>
+  <data name="resfmtPDFFileSavedSuccessfully" xml:space="preserve">
+    <value>Документ PDF "{0}" успешно сохранён</value>
+  </data>
+  <data name="resInformation" xml:space="preserve">
+    <value>Сообщение</value>
+  </data>
+  <data name="resSavePDFFilter" xml:space="preserve">
+    <value>Документы PDF|*.pdf</value>
+  </data>
 </root>

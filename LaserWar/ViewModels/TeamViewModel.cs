@@ -48,7 +48,7 @@ namespace LaserWar.ViewModels
 		/// <summary>
 		/// Суммарный рейтинг команды
 		/// </summary>
-		public int TeamRating
+		public int Rating
 		{
 			get { return m_model.players.Sum(arg => arg.rating); }
 		}
@@ -57,7 +57,7 @@ namespace LaserWar.ViewModels
 		/// <summary>
 		/// Средняя точность игроков команды
 		/// </summary>
-		public float TeamAccuracy
+		public float Accuracy
 		{
 			get { return m_model.players.Average(arg => arg.accuracy); }
 		}

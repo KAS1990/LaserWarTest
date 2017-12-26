@@ -266,18 +266,18 @@
 			</Button>
 												
 			<Button DockPanel.Dock="Right"
-					Content="{Loc resToVk}"
+					Content="{Loc resToPDF}"
 					Width="200"
 					Margin="0,5,5,5"
 					Style="{StaticResource ButtonStyle}"
-					Click="btnToVk_Click" />
+					Click="btnToPDF_Click" />
 			<Button DockPanel.Dock="Right"
-					Content="{Loc resToPDF}"
+					Content="{Loc resToVk}"
 					Width="200"
 					HorizontalAlignment="Right"
 					Margin="0,5,10,5"
 					Style="{StaticResource ButtonStyle1}"
-					Click="btnToPDF_Click" />
+					Click="btnToVk_Click" />
 		</DockPanel>
 				
 		<DataGrid Name="dgrdPlayers"
