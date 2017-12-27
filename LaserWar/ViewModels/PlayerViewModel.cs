@@ -269,21 +269,7 @@ namespace LaserWar.ViewModels
 			m_RestoreCommand = new RelayCommand(RestoreCommandExecute, arg => InEditing);
 		}
 
-			
-		public void RefreshAllProperties()
-		{
-			OnPropertyChanged(id_playerPropertyName);
-			OnPropertyChanged(namePropertyName);
-			OnPropertyChanged(ratingPropertyName);
-			OnPropertyChanged(accuracyPropertyName);
-			OnPropertyChanged(shotsPropertyName);
-			OnPropertyChanged(TeamIdNamePropertyName);
-			OnPropertyChanged(TeamNamePropertyName);
-			OnPropertyChanged(EditingFieldPropertyName);
-			OnPropertyChanged(InEditingPropertyName);
-		}
-		
-		
+				
 		protected override void OnPropertyChanged(string info)
 		{
 			if (info == EditingFieldPropertyName)
@@ -297,7 +283,6 @@ namespace LaserWar.ViewModels
 		}
 
 
-		#region Обработчики комманд
 		void EditCommandExecute(object arg)
 		{
 			m_FieldsWithErrors.Clear(); // Сброс ошибок перед началом редактирования
@@ -356,7 +341,6 @@ namespace LaserWar.ViewModels
 			
 			OnEditStateChanged(EditingField, enEditedPlayerState.Canceled);
 		}
-		#endregion
 
 
 		/// <summary>
