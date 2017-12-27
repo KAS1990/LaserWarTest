@@ -173,18 +173,10 @@ namespace LaserWar.Views
 
 
 		public void OnViewClosed()
-		{
-			/*Key key = Key.Escape;                    // Key to send
-			IInputElement target = Keyboard.FocusedElement;    // Target element
-			RoutedEvent routedEvent = Keyboard.KeyDownEvent; // Event to send
-
-			target.RaiseEvent(
-				  new KeyEventArgs(
-					Keyboard.PrimaryDevice,
-					PresentationSource.FromVisual(target as Visual),
-					0,
-					key) { RoutedEvent = routedEvent }
-				);*/
+		{	// Перед закрвтием панели отменяем все сделанные изменения
+			foreach (PlayerViewModel Player in dgrdPlayers.Items)
+				Player.RefreshAllProperties();
+			dgrdPlayers.CancelEdit(DataGridEditingUnit.Row);
 		}
 
 
