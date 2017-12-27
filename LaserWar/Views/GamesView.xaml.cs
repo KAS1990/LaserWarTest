@@ -60,7 +60,7 @@ namespace LaserWar.Views
 			{	// Представление скрылось => отображаем игры
 				m_ViewModel.SelectedGame = null;
 			}
-		}
+		}    
 
 
 		void ViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
