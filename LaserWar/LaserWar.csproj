@@ -118,6 +118,7 @@
       <DependentUpon>ProgressShape.xaml</DependentUpon>
     </Compile>
     <Compile Include="Global\AppAttributes.cs" />
+    <Compile Include="Global\BindingProxy.cs" />
     <Compile Include="Global\SelectedCollection\CanSelectedItem.cs" />
     <Compile Include="Global\SelectedCollection\CanSelectedItemManager.cs" />
     <Compile Include="Global\CNotifyPropertyChangedUserCtrl.cs" />
@@ -161,6 +162,11 @@
     <Compile Include="ViewModels\SoundsViewModel.cs" />
     <Compile Include="ViewModels\SoundViewModel.cs" />
     <Compile Include="ViewModels\TeamViewModel.cs" />
+    <Compile Include="Views\ValidationRules\PlayerAccuracyValidationRule.cs" />
+    <Compile Include="Views\ValidationRules\PlayerNameValidationRule.cs" />
+    <Compile Include="Views\ValidationRules\NotNegativeValidationRule.cs" />
+    <Compile Include="Views\ValidationRules\PlayerValidationRuleBase.cs" />
+    <Compile Include="Views\ValidationRules\PlayerValidationRuleWrapper.cs" />
     <Page Include="ExtraControls\DialogWnds\MessageDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

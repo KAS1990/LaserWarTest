@@ -72,6 +72,7 @@ namespace LaserWar.Views
 			{
 				if (m_ViewModel.SelectedGame == null)
 				{
+					m_GameView.OnViewClosed();
 					m_GameView.Visibility = Visibility.Hidden;
 					dpGames.Visibility = Visibility.Visible;
 				}

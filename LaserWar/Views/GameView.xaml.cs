@@ -26,6 +26,7 @@ using System.IO;
 using iTextSharp.text;
 using iTextSharp.awt.geom;
 using System.Threading.Tasks;
+using LaserWar.Views.ValidationRules;
 
 namespace LaserWar.Views
 {
@@ -36,7 +37,7 @@ namespace LaserWar.Views
 	{
 		#region ViewModel
 		private static readonly string ViewModelPropertyName = GlobalDefines.GetPropertyName<GameView>(m => m.ViewModel);
-
+				
 		private GameViewModel m_ViewModel = null;
 
 		public GameViewModel ViewModel
@@ -67,6 +68,9 @@ namespace LaserWar.Views
 			}
 		}
 		#endregion
+
+
+		private bool m_IsManualEditCommit;
 
 
 		/// <summary>
@@ -114,7 +118,9 @@ namespace LaserWar.Views
 			task = new SortTask<string>(PlayerViewModel.shotsPropertyName, 3);
 			task.Selected += task_Selected;
 			SortTasks.Add(task);
-			
+
+			m_IsManualEditCommit = false;
+
 			InitializeComponent();
 		}
 
@@ -166,6 +172,22 @@ namespace LaserWar.Views
 		}
 
 
+		public void OnViewClosed()
+		{
+			/*Key key = Key.Escape;                    // Key to send
+			IInputElement target = Keyboard.FocusedElement;    // Target element
+			RoutedEvent routedEvent = Keyboard.KeyDownEvent; // Event to send
+
+			target.RaiseEvent(
+				  new KeyEventArgs(
+					Keyboard.PrimaryDevice,
+					PresentationSource.FromVisual(target as Visual),
+					0,
+					key) { RoutedEvent = routedEvent }
+				);*/
+		}
+
+
 		void Players_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			if (e.NewItems != null)
@@ -185,6 +207,7 @@ namespace LaserWar.Views
 		}
 
 
+		#region Работа с PDF
 		private void btnToPDF_Click(object sender, RoutedEventArgs e)
 		{
 			LaserWarApp.MainWnd.ShowShadow = LaserWarApp.MainWnd.ShowProgressShape = true;
@@ -474,6 +497,7 @@ namespace LaserWar.Views
 				}));
 			}
 		}
+		#endregion
 
 
 		void msg_ButtonClicked(object sender, ButtonClickedEventArgs e)
@@ -481,5 +505,95 @@ namespace LaserWar.Views
 			e.Dlg.RemoveFromHost();
 			LaserWarApp.MainWnd.ShowShadow = LaserWarApp.MainWnd.ShowProgressShape = false;
 		}
+		
+
+		private void dgrdPlayers_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+		{
+			// Переводим объект, привязанный к строке в режим редактирования
+			PlayerViewModel SelctedPlayer = (e.Row.Item as PlayerViewModel);
+			if (SelctedPlayer.EditCommand.CanExecute(null))
+				SelctedPlayer.EditCommand.Execute(enEditedPlayerField.Field);
+		}
+
+
+		private void dgrdPlayers_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+		{
+			try
+			{
+				if (!m_IsManualEditCommit)
+				{
+					m_IsManualEditCommit = true;
+					// Вручную вызываем обновление ViewModel
+					PlayerViewModel SelectedPlayer = (e.Row.Item as PlayerViewModel);
+
+					// Удаляем из SelectedPlayer те ошибки, которых уже нет
+					List<string> ErrorsToLeave = new List<string>();
+					foreach (ValidationError error in Validation.GetErrors(e.Row))
+					{
+						BindingExpression be = error.BindingInError as BindingExpression;
+						if (be != null)
+						{
+							PlayerViewModel Player = be.DataItem as PlayerViewModel;
+							if (Player != null && Player.id_player == SelectedPlayer.id_player)
+								ErrorsToLeave.Add((error.RuleInError as PlayerValidationRuleBase).PropertyName);
+						}
+					}
+					SelectedPlayer.RemoveErrorsExcept(ErrorsToLeave);
+
+					if (e.EditAction == DataGridEditAction.Commit)
+						dgrdPlayers.CommitEdit(DataGridEditingUnit.Row, true);
+					else
+						dgrdPlayers.CancelEdit(DataGridEditingUnit.Row);
+
+					m_IsManualEditCommit = false;
+				}
+			}
+			catch (Exception ex)
+			{
+
+			}
+		}
+
+
+		private void dgrdPlayers_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+		{
+			// Вызываем команду для объекта, который привязан к строке
+			PlayerViewModel SelectedPlayer = (e.Row.Item as PlayerViewModel);
+			if (e.EditAction == DataGridEditAction.Commit)
+			{
+				if (SelectedPlayer.CommitChangesCommand.CanExecute(null))
+					SelectedPlayer.CommitChangesCommand.Execute(enEditedPlayerField.Field);
+			}
+			else
+			{
+				if (SelectedPlayer.RestoreCommand.CanExecute(null))
+					SelectedPlayer.RestoreCommand.Execute(enEditedPlayerField.Field);
+			}
+		}
+
+
+		void Row_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			if (((e.Source as DataGridRow).Item as PlayerViewModel).EditCommand.CanExecute(null))
+			{	// Вызываем команду EditCommand отсюда, а не из XAML, т.к. в этом случае оно будет обрабатываться в большем количестве случаев
+				((e.Source as DataGridRow).Item as PlayerViewModel).EditCommand.Execute(enEditedPlayerField.All);
+				e.Handled = true;
+			}
+		}
+
+
+		private void Cell_ValidationError(object sender, ValidationErrorEventArgs e)
+		{
+			BindingExpression be = e.Error.BindingInError as BindingExpression;
+			if (be != null)
+			{
+				PlayerViewModel Player = be.DataItem as PlayerViewModel;
+				if (Player != null)
+					Player.AddError((e.Error.RuleInError as PlayerValidationRuleBase).PropertyName);
+			}
+		}
+
+
+
 	}
 }

@@ -54,6 +54,7 @@
 	<SolidColorBrush x:Key="ProgressBarProgressBrush" Color="#FF005AFF" />
 	<SolidColorBrush x:Key="ProgressBarBackgroundBrush" Color="#FFF0F0F0" />
 	<SolidColorBrush x:Key="TextboxEnabledBorderBrush" Color="#FF005AFF" Opacity="{StaticResource StandartOpacity}"/>
+	<SolidColorBrush x:Key="TextboxEnabledBorderBrushWithAlpha" Color="#C9005AFF" Opacity="{StaticResource StandartOpacity}"/>
 	<SolidColorBrush x:Key="RowBordersBrush" Color="#FFF0F0F0" Opacity="{StaticResource StandartOpacity}" />
 	<SolidColorBrush x:Key="WaitingCircleBrush" Color="White"/>
 	<SolidColorBrush x:Key="ButtonBorderBrush1" Color="#FF005AFF"/>

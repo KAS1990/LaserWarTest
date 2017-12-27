@@ -16,13 +16,10 @@ namespace LaserWar.Stuff
 		/// </summary>
 		None,
 
-		Name,
-
-		Rating,
-
-		Accuracy,
-
-		Shots,
+		/// <summary>
+		/// Редактируется какое-то поле из таблицы 
+		/// </summary>
+		Field,
 
 		/// <summary>
 		/// Находимся в окне редактирования

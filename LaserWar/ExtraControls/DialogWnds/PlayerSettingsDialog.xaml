@@ -6,6 +6,7 @@
 					 xmlns:gconvs="clr-namespace:LaserWar.Global.Converters"
 					 xmlns:local="clr-namespace:LaserWar.ExtraControls.DialogWnds"
 					 xmlns:convs="clr-namespace:LaserWar.Views.Converters"
+					 xmlns:vrules="clr-namespace:LaserWar.Views.ValidationRules"
 	Height="400"
 	Width="500"
 	HorizontalAlignment="Center"
@@ -19,26 +20,31 @@
 			</ResourceDictionary.MergedDictionaries>
 			
 			<Style x:Key="TextBoxWithValidations" TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
-				<Setter Property="Margin" Value="0,20,0,0" />
+				<Setter Property="Margin" Value="0,0,0,0" />
 				<Setter Property="Width" Value="250" />
 				<Setter Property="HorizontalAlignment" Value="Left" />
 				<Setter Property="Opacity" Value="{StaticResource StandartOpacity}" />
 				<Setter Property="Validation.ErrorTemplate">
 					<Setter.Value>
 						<ControlTemplate>
-							<DockPanel LastChildFill="True">
-								<TextBlock DockPanel.Dock="Right"
-										   Foreground="Red"
-										   FontSize="26"
-										   FontWeight="Bold"
-										   Text="!"
-										   Margin="5,-15,0,0"
-										   ToolTip="{Binding ElementName=adornerPlaceholder, 
-																Path=AdornedElement.(Validation.Errors).CurrentItem.ErrorContent}"/>
-								<Border BorderBrush="Red" BorderThickness="0,0,0,2">
-									<AdornedElementPlaceholder Name="adornerPlaceholder"/>
-								</Border>
-							</DockPanel>
+							<Border BorderBrush="Red" BorderThickness="0,0,0,2">
+								<Grid>
+									<TextBlock HorizontalAlignment="Right"
+												Foreground="Red"
+												FontSize="26"
+												FontWeight="Bold"
+												Text="!"
+												Margin="0,0,0,0"
+												ToolTip="{Binding ElementName=adornerPlaceholder, 
+																	Path=AdornedElement.(Validation.Errors).CurrentItem.ErrorContent}" />
+							
+									<AdornedElementPlaceholder Name="adornerPlaceholder">
+										<AdornedElementPlaceholder.RenderTransform>
+											<TranslateTransform Y="17" />
+										</AdornedElementPlaceholder.RenderTransform>
+									</AdornedElementPlaceholder>
+								</Grid>
+							</Border>
 						</ControlTemplate>
 					</Setter.Value>
 				</Setter>
@@ -48,6 +54,8 @@
 					</Trigger>
 				</Style.Triggers>
 			</Style>
+			
+			<glob:BindingProxy x:Key="proxy" Data="{Binding}" />
 		</ResourceDictionary>
 	</local:DialogWndBase.Resources>
 	
@@ -77,24 +85,68 @@
 		
 		<StackPanel Grid.Row="1" Orientation="Vertical">
 			<Label Content="{Loc resPlayerName}" Style="{StaticResource TextBoxNameStyle}" />
-			<TextBox Text="{Binding name, Mode=TwoWay, ValidatesOnExceptions=True}"
-					 Style="{StaticResource TextBoxWithValidations}"
-					 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"/>
+			<TextBox Style="{StaticResource TextBoxWithValidations}"
+					 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}">
+				<TextBox.Text>
+					<Binding Path="name" Mode="TwoWay" ValidatesOnExceptions="True" UpdateSourceTrigger="PropertyChanged">
+						<Binding.ValidationRules>
+							<vrules:PlayerNameValidationRule ValidationStep="RawProposedValue" PropertyName="name" >
+								<vrules:PlayerNameValidationRule.Wrapper>
+									<vrules:PlayerValidationRuleWrapper Player="{Binding Data, Source={StaticResource proxy}}" />
+								</vrules:PlayerNameValidationRule.Wrapper>
+							</vrules:PlayerNameValidationRule>
+						</Binding.ValidationRules>
+					</Binding>
+				</TextBox.Text>
+			</TextBox>
 		</StackPanel>
 		<StackPanel Grid.Row="2" Orientation="Vertical">
 			<Label Content="{Loc resRating}" Style="{StaticResource TextBoxNameStyle}" />
-			<TextBox Text="{Binding rating, Converter={gconvs:IntParseMarkupConverter}, Mode=TwoWay, ValidatesOnExceptions=True}"
-					 Style="{StaticResource TextBoxWithValidations}" />
+			<TextBox Style="{StaticResource TextBoxWithValidations}" >
+				<TextBox.Text>
+					<Binding Path="rating" Mode="TwoWay" ValidatesOnExceptions="True" UpdateSourceTrigger="PropertyChanged">
+						<Binding.ValidationRules>
+							<vrules:NotNegativeValidationRule ValidationStep="RawProposedValue" PropertyName="rating" >
+								<vrules:NotNegativeValidationRule.Wrapper>
+									<vrules:PlayerValidationRuleWrapper Player="{Binding Data, Source={StaticResource proxy}}" />
+								</vrules:NotNegativeValidationRule.Wrapper>
+							</vrules:NotNegativeValidationRule>
+						</Binding.ValidationRules>
+					</Binding>
+				</TextBox.Text>
+			</TextBox>
 		</StackPanel>
 		<StackPanel Grid.Row="3" Orientation="Vertical">
 			<Label Content="{Loc resAccuracy}" Style="{StaticResource TextBoxNameStyle}" />
-			<TextBox Text="{Binding accuracy, Converter={convs:AccuracyMarkupConverter} , Mode=TwoWay, ValidatesOnExceptions=True}"
-					 Style="{StaticResource TextBoxWithValidations}" />
+			<TextBox Style="{StaticResource TextBoxWithValidations}" >
+				<TextBox.Text>
+					<Binding Path="accuracy" Converter="{convs:AccuracyMarkupConverter}" Mode="TwoWay" ValidatesOnExceptions="True" UpdateSourceTrigger="PropertyChanged">
+						<Binding.ValidationRules>
+							<vrules:PlayerAccuracyValidationRule ValidationStep="ConvertedProposedValue" PropertyName="accuracy" >
+								<vrules:PlayerAccuracyValidationRule.Wrapper>
+									<vrules:PlayerValidationRuleWrapper Player="{Binding Data, Source={StaticResource proxy}}" />
+								</vrules:PlayerAccuracyValidationRule.Wrapper>
+							</vrules:PlayerAccuracyValidationRule>
+						</Binding.ValidationRules>
+					</Binding>
+				</TextBox.Text>
+			</TextBox>
 		</StackPanel>
 		<StackPanel Grid.Row="4" Orientation="Vertical">
 			<Label Content="{Loc resShots}" Style="{StaticResource TextBoxNameStyle}" />
-			<TextBox Text="{Binding shots, Converter={gconvs:IntParseMarkupConverter}, Mode=TwoWay, ValidatesOnExceptions=True}"
-					 Style="{StaticResource TextBoxWithValidations}" />
+			<TextBox Style="{StaticResource TextBoxWithValidations}" >
+				<TextBox.Text>
+					<Binding Path="shots" Mode="TwoWay" ValidatesOnExceptions="True" UpdateSourceTrigger="PropertyChanged">
+						<Binding.ValidationRules>
+							<vrules:NotNegativeValidationRule ValidationStep="RawProposedValue" PropertyName="shots" >
+								<vrules:NotNegativeValidationRule.Wrapper>
+									<vrules:PlayerValidationRuleWrapper Player="{Binding Data, Source={StaticResource proxy}}" />
+								</vrules:NotNegativeValidationRule.Wrapper>
+							</vrules:NotNegativeValidationRule>
+						</Binding.ValidationRules>
+					</Binding>
+				</TextBox.Text>
+			</TextBox>
 		</StackPanel>
 		
 		<DockPanel Grid.Row="5" Height="40">

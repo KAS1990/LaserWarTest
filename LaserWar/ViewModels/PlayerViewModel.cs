@@ -46,10 +46,7 @@ namespace LaserWar.ViewModels
 			set
 			{
 				if (string.IsNullOrWhiteSpace(value))
-				{
 					AddError(namePropertyName);
-					throw new ArgumentException(Properties.Resources.resNameCouldNotBeEmpty);
-				}
 				else
 				{
 					RemoveError(namePropertyName);
@@ -72,10 +69,8 @@ namespace LaserWar.ViewModels
 			set
 			{
 				if (value < 0)
-				{
 					AddError(ratingPropertyName);
-					throw new ArgumentException(Properties.Resources.resRatingMustBeNotNegative);
-				}
+				else
 				{
 					RemoveError(ratingPropertyName);
 					m_modelPlayer.rating = value;
@@ -97,10 +92,7 @@ namespace LaserWar.ViewModels
 			set
 			{
 				if (value < 0 || value > 1)
-				{
 					AddError(accuracyPropertyName);
-					throw new ArgumentException(Properties.Resources.resAccuracyMustBeFrom0To1);
-				}
 				else
 				{
 					RemoveError(accuracyPropertyName);
@@ -197,19 +189,25 @@ namespace LaserWar.ViewModels
 
 		#region m_FieldsWithErrors
 		private HashSet<string> m_FieldsWithErrors = new HashSet<string>();
-		private void AddError(string FieldName)
+		public void AddError(string FieldName)
 		{
 			if (m_FieldsWithErrors.Add(FieldName))
 			{	// Такого элемента ещё не было => нужно изменить состояние команды
 				m_CommitChangesCommand.RaiseCanExecuteChanged();
 			}
 		}
-		private void RemoveError(string FieldName)
+		public void RemoveError(string FieldName)
 		{
 			if (m_FieldsWithErrors.Remove(FieldName))
 			{	// Такой элемент был => нужно изменить состояние команды
 				m_CommitChangesCommand.RaiseCanExecuteChanged();
 			}
+		}
+		public void RemoveErrorsExcept(List<string> ExceptList)
+		{
+			foreach (string FieldName in m_FieldsWithErrors.Where(arg => !ExceptList.Contains(arg)).ToList())
+				m_FieldsWithErrors.Remove(FieldName);
+			m_CommitChangesCommand.RaiseCanExecuteChanged();
 		}
 		#endregion
 
@@ -318,6 +316,8 @@ namespace LaserWar.ViewModels
 				m_modelTeam = TeamInDB;
 			}
 			
+			m_FieldsWithErrors.Clear();
+			
 			OnEditStateChanged(EditingField, enEditedPlayerState.Commited);
 		}
 
@@ -336,6 +336,8 @@ namespace LaserWar.ViewModels
 				m_modelTeam = m_modelTeam.Context.teams.First(x => x.id_team == m_modelTeam.id_team) as team;
 				m_modelPlayer.Context.Entry(m_modelTeam).State = System.Data.Entity.EntityState.Unchanged;
 			}
+
+			m_FieldsWithErrors.Clear();
 			
 			OnEditStateChanged(EditingField, enEditedPlayerState.Canceled);
 		}

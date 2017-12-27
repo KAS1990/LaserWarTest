@@ -70,7 +70,7 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Точность должна быть в диапазоне от 0% до 100%.
+        ///   Looks up a localized string similar to Точность должна быть числом в диапазоне от 0% до 100%.
         /// </summary>
         internal static string resAccuracyMustBeFrom0To1 {
             get {
@@ -396,7 +396,7 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Число выстрелов не должно быть отрицательным.
+        ///   Looks up a localized string similar to Число выстрелов должно быть неотрицательным числом.
         /// </summary>
         internal static string resShotsMustBeNotNegative {
             get {

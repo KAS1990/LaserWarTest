@@ -224,7 +224,7 @@
     <value>Сохранить</value>
   </data>
   <data name="resAccuracyMustBeFrom0To1" xml:space="preserve">
-    <value>Точность должна быть в диапазоне от 0% до 100%</value>
+    <value>Точность должна быть числом в диапазоне от 0% до 100%</value>
   </data>
   <data name="resNameCouldNotBeEmpty" xml:space="preserve">
     <value>Поле "Имя игрока" не должно быть пустым</value>
@@ -233,7 +233,7 @@
     <value>Рейтинг должен быть положительным числом</value>
   </data>
   <data name="resShotsMustBeNotNegative" xml:space="preserve">
-    <value>Число выстрелов не должно быть отрицательным</value>
+    <value>Число выстрелов должно быть неотрицательным числом</value>
   </data>
   <data name="resfmtPDFFileDontSaved" xml:space="preserve">
     <value>Не удалось сохранить документ PDF

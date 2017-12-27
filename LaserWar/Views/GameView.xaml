@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:local="clr-namespace:LaserWar.Views"
+			 xmlns:vrules="clr-namespace:LaserWar.Views.ValidationRules"
 			 xmlns:convs="clr-namespace:LaserWar.Views.Converters"
              xmlns:glob="clr-namespace:LaserWar.Global"
 			 xmlns:gconvs="clr-namespace:LaserWar.Global.Converters"
@@ -21,7 +22,7 @@
 					<PropertyGroupDescription PropertyName="TeamId" />
 				</CollectionViewSource.GroupDescriptions>
 			</CollectionViewSource>
-			
+									
 			<ControlTemplate x:Key="GroupExpanderTemplate" TargetType="{x:Type Expander}">
 				<DockPanel LastChildFill="True">
 					<ToggleButton DockPanel.Dock="Top"
@@ -202,6 +203,54 @@
 				</Setter>
 			</Style>
 			
+			<ControlTemplate x:Key="ErrorTemplate" TargetType="Control">
+				<Border BorderBrush="Red" BorderThickness="0,0,0,2">
+					<Grid>
+						<TextBlock HorizontalAlignment="Right"
+									Foreground="Red"
+									FontSize="26"
+									FontWeight="Bold"
+									Text="!"
+									Margin="0,0,0,0"
+									ToolTip="{Binding ElementName=adornerPlaceholder, 
+														Path=AdornedElement.(Validation.Errors).CurrentItem.ErrorContent}" />
+							
+						<AdornedElementPlaceholder Name="adornerPlaceholder">
+							<AdornedElementPlaceholder.RenderTransform>
+								<TranslateTransform Y="10" />
+							</AdornedElementPlaceholder.RenderTransform>
+						</AdornedElementPlaceholder>
+					</Grid>
+				</Border>
+			</ControlTemplate>
+			
+			<!-- Стили для ячеек, которые можна редактировать -->
+			<!-- В режиме редактирования -->
+			<Style x:Key="CellInEditingStyle" TargetType="TextBox" BasedOn="{StaticResource TextBoxStyle}">
+				<Setter Property="Padding" Value="-2,1,0,3" />
+				<Setter Property="Validation.ErrorTemplate" Value="{StaticResource ErrorTemplate}" />
+				<EventSetter Event="Validation.Error" Handler="Cell_ValidationError" />
+					
+				<Style.Triggers>
+					<Trigger Property="Validation.HasError" Value="True">
+						<Setter Property="Foreground" Value="Red"/>
+					</Trigger>
+				</Style.Triggers>
+			</Style>
+			
+			<Style x:Key="CellStandartStyle" TargetType="TextBlock" BasedOn="{StaticResource OutputTextBlockStyle}">
+				<Setter Property="Validation.ErrorTemplate" Value="{StaticResource ErrorTemplate}" />
+								
+				<Style.Triggers>
+					<DataTrigger Binding="{Binding IsFocused, RelativeSource={RelativeSource AncestorType=DataGridCell}}" Value="True" >
+						<Setter Property="Padding" Value="0,1,3,3" />
+					</DataTrigger>
+					
+					<Trigger Property="Validation.HasError" Value="True">
+						<Setter Property="Foreground" Value="Red"/>
+					</Trigger>
+				</Style.Triggers>
+			</Style>
 		</ResourceDictionary>
 	</glob:CNotifyPropertyChangedUserCtrl.Resources>
 		
@@ -297,7 +346,6 @@
 				  Height="500"
 				  MaxWidth="900"
 				  RowHeight="50"
-				  IsReadOnly="True"
 				  BorderThickness="{StaticResource TextBoxBorderThickness}"
 				  BorderBrush="{StaticResource TextboxEnabledBorderBrush}"
 				  ScrollViewer.CanContentScroll="False" 
@@ -307,7 +355,10 @@
 				  FontFamily="{StaticResource TextFont}"
 				  HorizontalGridLinesBrush="Transparent"
 				  VerticalGridLinesBrush="Transparent"
-				  Background="Transparent">
+				  Background="Transparent"
+				  BeginningEdit="dgrdPlayers_BeginningEdit"
+				  CellEditEnding="dgrdPlayers_CellEditEnding"
+				  RowEditEnding="dgrdPlayers_RowEditEnding">
 			<DataGrid.Resources>
 				<Style TargetType="ScrollBar" BasedOn="{StaticResource VerticalScrollBarStyle}" />
 			</DataGrid.Resources>
@@ -330,10 +381,42 @@
 					<Setter Property="Background" Value="Transparent" />
 					<Setter Property="VerticalAlignment" Value="Bottom" />
 					<Setter Property="Margin" Value="0,0,5,2" />
+										
+					<Setter Property="FocusVisualStyle">
+						<Setter.Value>
+							<Style TargetType="Control">
+								<Setter Property="Control.Template">
+									<Setter.Value>
+										<ControlTemplate TargetType="{x:Type Control}">
+											<Border Width="{TemplateBinding ActualWidth}"
+													Height="{TemplateBinding ActualHeight}"
+													BorderThickness="{StaticResource TextBoxBorderThickness}"
+													BorderBrush="{StaticResource TextboxEnabledBorderBrush}" >
+												<Border.RenderTransform>
+													<TranslateTransform Y="-1" />
+												</Border.RenderTransform>
+											</Border>
+										</ControlTemplate>
+									</Setter.Value>
+								</Setter>
+							</Style>
+						</Setter.Value>
+					</Setter>
+					
 					<Style.Triggers>
 						<Trigger Property="IsSelected" Value="true">
 							<!-- Выделять строки нам не нужно -->
 							<Setter Property="Background" Value="Transparent" />
+						</Trigger>
+						
+						<Trigger Property="IsFocused" Value="true">
+							<Setter Property="BorderThickness" Value="{StaticResource TextBoxBorderThickness}" />
+							<Setter Property="BorderBrush" Value="{StaticResource TextboxEnabledBorderBrushWithAlpha}" />
+							<Setter Property="Margin" Value="0,0,5,-2" />
+						</Trigger>
+						
+						<Trigger Property="IsEditing" Value="true">
+							<Setter Property="Margin" Value="0,0,5,-2" />
 						</Trigger>
 					</Style.Triggers>
 				</Style>
@@ -379,6 +462,7 @@
 							</ControlTemplate>
 						</Setter.Value>
 					</Setter>
+					<EventSetter Event="PreviewMouseDoubleClick" Handler="Row_PreviewMouseDoubleClick" />
 				</Style>
 			</DataGrid.RowStyle>
 			
@@ -405,9 +489,23 @@
 			
 			<DataGrid.Columns>
 				<!-- Игрок -->
-				<DataGridTextColumn Binding="{Binding name}"
-									ElementStyle="{StaticResource OutputTextBlockStyle}"
+				<DataGridTextColumn ElementStyle="{StaticResource CellStandartStyle}"
+									EditingElementStyle ="{StaticResource CellInEditingStyle}"
 									Width="200" >
+					<!-- Добавляем правило проверки, т.к. только так можно заблокировать поле в таблице до тех пор,
+						пока не будет введено корректное значение -->
+					<DataGridTextColumn.Binding>
+						<Binding Path="name"
+								 Mode="TwoWay"
+								 ValidatesOnExceptions="True"
+								 UpdateSourceTrigger="PropertyChanged"
+								 NotifyOnValidationError="True">
+							<Binding.ValidationRules>
+								<vrules:PlayerNameValidationRule ValidationStep="RawProposedValue" PropertyName="name" />
+							</Binding.ValidationRules>
+						</Binding>
+					</DataGridTextColumn.Binding>
+					
 					<DataGridTextColumn.Header>
 						<Button Content="{Loc resPlayer}"
 								Style="{StaticResource MyColumnHeaderStyle}"
@@ -417,9 +515,22 @@
 				</DataGridTextColumn>
 				
 				<!-- Рейтинг -->
-				<DataGridTextColumn Binding="{Binding rating}"
-									ElementStyle="{StaticResource OutputTextBlockStyle}"
+				<DataGridTextColumn ElementStyle="{StaticResource CellStandartStyle}"
+									EditingElementStyle="{StaticResource CellInEditingStyle}"
 									Width="170" >
+					<DataGridTextColumn.Binding>
+						<Binding Path="rating"
+								 Mode="TwoWay"
+								 ValidatesOnExceptions="True"
+								 UpdateSourceTrigger="PropertyChanged"
+								 NotifyOnValidationError="True">
+							<Binding.ValidationRules>
+								<vrules:NotNegativeValidationRule ValidationStep="RawProposedValue" PropertyName="rating" >
+								</vrules:NotNegativeValidationRule>
+							</Binding.ValidationRules>
+						</Binding>
+					</DataGridTextColumn.Binding>
+					
 					<DataGridTextColumn.Header>
 						<Button Content="{Loc resRating}"
 								Style="{StaticResource MyColumnHeaderStyle}"
@@ -429,9 +540,22 @@
 				</DataGridTextColumn>
 				
 				<!-- Точность -->
-				<DataGridTextColumn Binding="{Binding accuracy, Converter={convs:AccuracyMarkupConverter}}"
-									ElementStyle="{StaticResource OutputTextBlockStyle}"
+				<DataGridTextColumn ElementStyle="{StaticResource CellStandartStyle}"
+									EditingElementStyle ="{StaticResource CellInEditingStyle}"
 									Width="170" >
+					<DataGridTextColumn.Binding>
+						<Binding Path="accuracy"
+								 Mode="TwoWay"
+								 ValidatesOnExceptions="True"
+								 Converter="{convs:AccuracyMarkupConverter}"
+								 UpdateSourceTrigger="PropertyChanged"
+								 NotifyOnValidationError="True">
+							<Binding.ValidationRules>
+								<vrules:PlayerAccuracyValidationRule ValidationStep="ConvertedProposedValue" PropertyName="accuracy" />
+							</Binding.ValidationRules>
+						</Binding>
+					</DataGridTextColumn.Binding>
+					
 					<DataGridTextColumn.Header>
 						<Button Content="{Loc resAccuracy}" 
 								Style="{StaticResource MyColumnHeaderStyle}"
@@ -441,9 +565,21 @@
 				</DataGridTextColumn>
 				
 				<!-- Выстрелы -->
-				<DataGridTextColumn Binding="{Binding shots}"
-									ElementStyle="{StaticResource OutputTextBlockStyle}"
+				<DataGridTextColumn ElementStyle="{StaticResource CellStandartStyle}"
+									EditingElementStyle ="{StaticResource CellInEditingStyle}"
 									Width="170" >
+					<DataGridTextColumn.Binding>
+						<Binding Path="shots"
+								 Mode="TwoWay"
+								 ValidatesOnExceptions="True"
+								 UpdateSourceTrigger="PropertyChanged"
+								 NotifyOnValidationError="True" >
+							<Binding.ValidationRules>
+								<vrules:NotNegativeValidationRule ValidationStep="RawProposedValue" PropertyName="shots" />
+							</Binding.ValidationRules>
+						</Binding>
+					</DataGridTextColumn.Binding>
+					
 					<DataGridTextColumn.Header>
 						<Button Content="{Loc resShots}"
 								Style="{StaticResource MyColumnHeaderStyle}"
