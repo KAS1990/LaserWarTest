@@ -27,6 +27,8 @@ using iTextSharp.text;
 using iTextSharp.awt.geom;
 using System.Threading.Tasks;
 using LaserWar.Views.ValidationRules;
+using System.Reflection;
+using LaserWar.VK;
 
 namespace LaserWar.Views
 {
@@ -195,7 +197,16 @@ namespace LaserWar.Views
 
 		private void btnToVk_Click(object sender, RoutedEventArgs e)
 		{
+			GlobalDefines.SuppressWininetBehavior();
 
+			LaserWarApp.MainWnd.ShowShadow = LaserWarApp.MainWnd.ShowProgressShape = true;
+
+			SendToVKDialog dlg = new SendToVKDialog(LaserWarApp.MainWnd.brdShadow, this);
+			dlg.ButtonClicked += (s, ev) =>
+			{
+				ev.Dlg.RemoveFromHost();
+				LaserWarApp.MainWnd.ShowShadow = LaserWarApp.MainWnd.ShowProgressShape = false;
+			};
 		}
 
 
@@ -216,18 +227,25 @@ namespace LaserWar.Views
 			bool? res = dlg.ShowDialog();
 			if (res.HasValue && res.Value)
 			{	// Создаём PDF в другом потоке
-				Task.Factory.StartNew(WriteDataToPDF, dlg.FileName);
+				PDFCreationTask PDFTask = new PDFCreationTask()
+				{
+					FileName = dlg.FileName,
+					ShowMessage = true
+				};
+				Task.Factory.StartNew((Func<object, bool>)WriteDataToPDF, PDFTask);
 			}
 			else
 				LaserWarApp.MainWnd.ShowShadow = LaserWarApp.MainWnd.ShowProgressShape = false;
 		}
 
 
-		private void WriteDataToPDF(object FileName)
+		public bool WriteDataToPDF(object state)
 		{
+			PDFCreationTask Task = state as PDFCreationTask;
+
 			try
 			{
-				using (FileStream fs = new FileStream(FileName.ToString(), FileMode.Create, FileAccess.Write, FileShare.None))
+				using (FileStream fs = new FileStream(Task.FileName, FileMode.Create, FileAccess.Write, FileShare.None))
 				{
 					Document Doc = new Document(PageSize.A4, 30, 30, 30, 30);
 					PdfWriter writer = PdfWriter.GetInstance(Doc, fs);
@@ -237,7 +255,7 @@ namespace LaserWar.Views
 
 					// Название игры
 					BaseFont baseFont = BaseFont.CreateFont("Arial Cyr.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-					iTextSharp.text.Paragraph para = new iTextSharp.text.Paragraph(new Phrase(m_ViewModel.name + "  " + m_ViewModel.date.ToString(),
+					iTextSharp.text.Paragraph para = new iTextSharp.text.Paragraph(new Phrase(m_ViewModel.name + "  " + m_ViewModel.DateHRD.ToShortDateString(),
 																					new Font(baseFont, 30, Font.BOLD)))
 					{
 						Alignment = Element.ALIGN_LEFT,
@@ -465,28 +483,38 @@ namespace LaserWar.Views
 					Doc.Close();
 					writer.Close();
 
-					Application.Current.Dispatcher.Invoke(new Action(delegate()
-					{	// Это нужно делать в основном потоке
-						MessageDialog msg = new MessageDialog(LaserWarApp.MainWnd.brdShadow)
-						{
-							Title = Properties.Resources.resInformation,
-							Message = string.Format(Properties.Resources.resfmtPDFFileSavedSuccessfully, FileName)
-						};
-						msg.ButtonClicked += msg_ButtonClicked;
-					}));
+					if (Task.ShowMessage)
+					{
+						Application.Current.Dispatcher.Invoke(new Action(delegate()
+						{	// Это нужно делать в основном потоке
+							MessageDialog msg = new MessageDialog(LaserWarApp.MainWnd.brdShadow)
+							{
+								Title = Properties.Resources.resInformation,
+								Message = string.Format(Properties.Resources.resfmtPDFFileSavedSuccessfully, Task.FileName)
+							};
+							msg.ButtonClicked += msg_ButtonClicked;
+						}));
+					}
+
+					return true;
 				}
 			}
 			catch (Exception ex)
 			{
-				Application.Current.Dispatcher.Invoke(new Action(delegate()
-				{	// Это нужно делать в основном потоке
-					MessageDialog msg = new MessageDialog(LaserWarApp.MainWnd.brdShadow)
-					{
-						Title = Properties.Resources.resErrorOccured,
-						Message = string.Format(Properties.Resources.resfmtPDFFileDontSaved, FileName)
-					};
-					msg.ButtonClicked += msg_ButtonClicked;
-				}));
+				if (Task.ShowMessage)
+				{
+					Application.Current.Dispatcher.Invoke(new Action(delegate()
+					{	// Это нужно делать в основном потоке
+						MessageDialog msg = new MessageDialog(LaserWarApp.MainWnd.brdShadow)
+						{
+							Title = Properties.Resources.resErrorOccured,
+							Message = string.Format(Properties.Resources.resfmtPDFFileDontSaved, Task.FileName)
+						};
+						msg.ButtonClicked += msg_ButtonClicked;
+					}));
+				}
+
+				return false;
 			}
 		}
 		#endregion

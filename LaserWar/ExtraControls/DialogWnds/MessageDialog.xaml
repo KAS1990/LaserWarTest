@@ -34,7 +34,8 @@
 				Content="{Loc resClose}"
 				Width="120"
 				Height="35"
-				Style="{StaticResource ButtonStyle}" Click="btnClose_Click" />
+				Style="{StaticResource ButtonStyle}"
+				Click="btnClose_Click" />
 		
 		<TextBlock Text="{Binding Message}" TextWrapping="Wrap" Style="{StaticResource OutputTextBlockStyle}" Margin="0,0,0,10" />
     </DockPanel>

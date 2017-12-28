@@ -81,7 +81,7 @@ namespace LaserWar.Entities
 
 		private int m_date = 0;
 		/// <summary>
-		/// Пока дату будем хранить в виде целого числа, т.к. как преобразовать его в дату, я не знаю
+		/// Дата в том виде, в котором она хранится на сервере
 		/// </summary>
 		[Required]
 		public int date
@@ -94,11 +94,27 @@ namespace LaserWar.Entities
 					m_date = value;
 					
 					OnPropertyChanged(datePropertyName);
+					OnPropertyChanged(DateHRDPropertyName);
 				}
 			}
 		}
-		#endregion
 
+
+		private static readonly string DateHRDPropertyName = GlobalDefines.GetPropertyName<game>(m => m.DateHRD);
+		/// <summary>
+		/// Дата проведения игры в человекопонятном формате (human readable date)
+		/// </summary>
+		[NotMapped]
+		public DateTime DateHRD
+		{
+			get
+			{
+				System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+				return dtDateTime.AddSeconds(date).ToLocalTime();
+			}
+		}
+		#endregion
+		
 
 		/// <summary>
 		/// Команды

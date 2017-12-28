@@ -132,6 +132,7 @@
     <Compile Include="Models\SoundsModel.cs" />
     <Compile Include="Stuff\DataDownloadComletedEventArgs.cs" />
     <Compile Include="Stuff\EntitiesContextEventArgs.cs" />
+    <Compile Include="Stuff\PDFCreationTask.cs" />
     <Compile Include="Stuff\PlayerEditEventArgs.cs" />
     <Compile Include="Stuff\SortTask.cs" />
     <Compile Include="Stuff\SoundModelEventArgs.cs" />
@@ -167,6 +168,14 @@
     <Compile Include="Views\ValidationRules\NotNegativeValidationRule.cs" />
     <Compile Include="Views\ValidationRules\PlayerValidationRuleBase.cs" />
     <Compile Include="Views\ValidationRules\PlayerValidationRuleWrapper.cs" />
+    <Compile Include="VK\docs_SaveAns.cs" />
+    <Compile Include="VK\photos_saveWallPhotoAns.cs" />
+    <Compile Include="VK\SendToVKDialog.xaml.cs">
+      <DependentUpon>SendToVKDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="VK\StdVkAnswer.cs" />
+    <Compile Include="VK\VkAPI.cs" />
+    <Compile Include="VK\VKGroup.cs" />
     <Page Include="ExtraControls\DialogWnds\MessageDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -217,6 +226,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SoundsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="VK\SendToVKDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -50,12 +50,21 @@ namespace LaserWar.ViewModels
 		private static readonly string datePropertyName = GlobalDefines.GetPropertyName<GameViewModel>(m => m.date);
 
 		/// <summary>
-		/// Дата проведения соревнований
+		/// 
 		/// </summary>
 		public int date
 		{
 			get { return m_model.date; }
 			set { m_model.date = value; }
+		}
+
+
+		/// <summary>
+		/// Дата проведения соревнований
+		/// </summary>
+		public DateTime DateHRD
+		{
+			get { return m_model.DateHRD; }
 		}
 		#endregion
 

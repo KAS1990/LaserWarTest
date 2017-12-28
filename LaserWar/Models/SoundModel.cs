@@ -199,6 +199,7 @@ namespace LaserWar.Models
 
 			m_SoundId = SoundId;
 			Sound = GetSound();
+			Sound.Context = Parent.DBContext;
 			Sound.PropertyChanged += (s, e) => { OnSoundUpdated(e.PropertyName); };
 
 			m_FileDowloader.DownloadFileCompleted += FileDowloader_DownloadAsyncCompleted;
@@ -211,6 +212,7 @@ namespace LaserWar.Models
 			m_SoundId = sound.id_sound;
 			
 			Sound = sound;
+			Sound.Context = Parent.DBContext;
 			Sound.PropertyChanged += (s, e) => { OnSoundUpdated(e.PropertyName); };
 
 			m_Parent = Parent;

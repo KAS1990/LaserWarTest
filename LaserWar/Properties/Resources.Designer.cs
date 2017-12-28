@@ -97,6 +97,24 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Не удалось сохранить скриншот программы.
+        /// </summary>
+        internal static string resCantCreateScreen {
+            get {
+                return ResourceManager.GetString("resCantCreateScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Не удалось опубликовать сообщение.
+        /// </summary>
+        internal static string resCantPublicatePost {
+            get {
+                return ResourceManager.GetString("resCantPublicatePost", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Закрыть.
         /// </summary>
         internal static string resClose {
@@ -207,6 +225,15 @@ namespace LaserWar.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Запись успешно опубликована в группе &quot;{0}&quot;..
+        /// </summary>
+        internal static string resfmtPostPublishedSuccessfully {
+            get {
+                return ResourceManager.GetString("resfmtPostPublishedSuccessfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Дата проведения.
         /// </summary>
         internal static string resGameDate {
@@ -230,6 +257,15 @@ namespace LaserWar.Properties {
         internal static string resGames {
             get {
                 return ResourceManager.GetString("resGames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Группы.
+        /// </summary>
+        internal static string resGroups {
+            get {
+                return ResourceManager.GetString("resGroups", resourceCulture);
             }
         }
         
@@ -347,6 +383,15 @@ namespace LaserWar.Properties {
         internal static string resPlayFile {
             get {
                 return ResourceManager.GetString("resPlayFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Опубликовать.
+        /// </summary>
+        internal static string resPublicate {
+            get {
+                return ResourceManager.GetString("resPublicate", resourceCulture);
             }
         }
         

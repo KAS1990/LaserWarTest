@@ -5,7 +5,8 @@
 	<!-- Затемнение при длительном ожидании и отображении диалогового окна -->
 	<sys:Double x:Key="ShadowScreenOpacity">0.7</sys:Double>
 	<sys:Double x:Key="StandartOpacity">0.8</sys:Double>
-	
+	<sys:Double x:Key="ButtonDisabledOpacity">0.5</sys:Double>
+		
 	<!-- Цвета шрифтов -->
 	<!-- Заголовки панелей -->
 	<SolidColorBrush x:Key="TitleTextBrush" Color="Black"/>

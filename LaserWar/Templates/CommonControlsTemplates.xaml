@@ -101,6 +101,7 @@
 		
 		<Style.Triggers>
 			<Trigger Property="IsEnabled" Value="false" >
+				<Setter Property="Opacity" Value="{StaticResource ButtonDisabledOpacity}" />
 				<Setter Property="Foreground" Value="{StaticResource ButtonDisabledForegroundBrush}" />
 				<Setter Property="Background" Value="{StaticResource ButtonDisabledBackgroundBrush}" />
 			</Trigger>
@@ -126,9 +127,9 @@
 		<Setter Property="FontWeight" Value="{StaticResource ButtonFontWeight}" />
 		<Setter Property="Padding" Value="{StaticResource ButtonPadding}" />
 		<Setter Property="Margin" Value="{StaticResource ButtonMargin}" />
-		<Setter Property="Opacity" Value="{StaticResource StandartOpacity}" />
 		<Setter Property="HorizontalContentAlignment" Value="{StaticResource ButtonHorizontalContentAlignment}" />
 		<Setter Property="VerticalContentAlignment" Value="{StaticResource ButtonVerticalContentAlignment}" />
+		<Setter Property="Opacity" Value="{StaticResource StandartOpacity}" />
 		
 		<Setter Property="Template">
 			<Setter.Value>
@@ -151,6 +152,7 @@
 		
 		<Style.Triggers>
 			<Trigger Property="IsEnabled" Value="false" >
+				<Setter Property="Opacity" Value="{StaticResource ButtonDisabledOpacity}" />
 				<Setter Property="Foreground" Value="{StaticResource ButtonDisabledForegroundBrush1}" />
 				<Setter Property="Background" Value="{StaticResource ButtonDisabledBackgroundBrush1}" />
 			</Trigger>

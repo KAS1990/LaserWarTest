@@ -134,7 +134,7 @@
 				
 					<!-- Дата проведения-->
 					<DataGridTextColumn Header="{Loc resGameDate}"
-										Binding="{Binding date}"
+										Binding="{Binding DateHRD, StringFormat={}{0:dd.MM.yy}}"
 										ElementStyle="{StaticResource OutputTextBlockStyle}"
 										Width="200" />
 				

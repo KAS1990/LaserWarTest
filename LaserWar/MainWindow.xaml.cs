@@ -62,11 +62,6 @@ namespace LaserWar
 				if (m_ShowShadow != value)
 				{
 					m_ShowShadow = value;
-					if (!m_ShowShadow)
-					{
-						ShowProgressShape = false;
-						brdShadow.Child = null; // Если убрали затемнение, то никакие эдементы на нём нам больше не нужны
-					}
 					OnPropertyChanged(ShowShadowPropertyName);
 				}
 			}
@@ -87,13 +82,26 @@ namespace LaserWar
 				if (m_ShowProgressShape != value)
 				{
 					m_ShowProgressShape = value;
-					if (m_ShowProgressShape)
-						brdShadow.Child = new ProgressShape();
-					else
-						brdShadow.Child = null;
+					ShowProgressShapeIfNeeded();
 					OnPropertyChanged(ShowProgressShapePropertyName);
 				}
 			}
+		}
+
+
+		public void ShowProgressShapeIfNeeded()
+		{
+			if (ShowProgressShape)
+				brdShadow.Child = new ProgressShape();
+			else
+				brdShadow.Child = null;
+		}
+
+
+		public void RemoveProgressShapeIfExisted()
+		{
+			if (brdShadow.Child is ProgressShape)
+				brdShadow.Child = null;
 		}
 		#endregion
 				
@@ -104,9 +112,7 @@ namespace LaserWar
 			InitializeComponent();
 
 			LaserWarApp.MainWnd = this;
-
-			GlobalDefines.SuppressWininetBehavior();
-						
+												
 			try
 			{
 				// Этот Grid необходим для подбора размеров tbctrlPanels

@@ -59,11 +59,22 @@ namespace LaserWar.ExtraControls.DialogWnds
 
 
 		/// <summary>
-		/// Убрать 
+		///
 		/// </summary>
 		public void RemoveFromHost()
 		{
 			Host.Child = null;
+			LaserWarApp.MainWnd.ShowProgressShapeIfNeeded();
+		}
+
+
+		/// <summary>
+		///
+		/// </summary>
+		public void AddToHost()
+		{
+			LaserWarApp.MainWnd.RemoveProgressShapeIfExisted();
+			Host.Child = this;
 		}
 	}
 }

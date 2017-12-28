@@ -69,15 +69,16 @@
 		<Border Grid.Column="0"
 				Grid.Row="4"
 				Grid.ColumnSpan="10"
-				BorderThickness="{StaticResource TextBoxBorderThickness}"
+				BorderThickness="1"
 				BorderBrush="{StaticResource TextboxEnabledBorderBrush}">
-			<ScrollViewer Height="300" MinWidth="600" HorizontalScrollBarVisibility="Hidden">
+			<ScrollViewer Height="300" MinWidth="600" HorizontalScrollBarVisibility="Hidden" >
 				<ScrollViewer.Resources>
 					<Style TargetType="ScrollBar" BasedOn="{StaticResource VerticalScrollBarStyle}" />
 				</ScrollViewer.Resources>
 				<TextBox Text="{Binding JSONText}"
 						 IsReadOnly="True"
-					   Style="{StaticResource TextBoxStyle}" />
+						 BorderThickness="1" 
+						 Style="{StaticResource TextBoxStyle}" />
 			</ScrollViewer>
 		</Border>
     </Grid>

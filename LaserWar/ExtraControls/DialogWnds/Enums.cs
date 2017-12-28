@@ -12,6 +12,7 @@ namespace LaserWar.ExtraControls.DialogWnds
 	{
 		Close,
 		Cancel,
-		Save
+		Save,
+		Publicate
 	}
 }

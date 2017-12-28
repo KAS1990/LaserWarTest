@@ -248,4 +248,19 @@
   <data name="resSavePDFFilter" xml:space="preserve">
     <value>Документы PDF|*.pdf</value>
   </data>
+  <data name="resGroups" xml:space="preserve">
+    <value>Группы</value>
+  </data>
+  <data name="resPublicate" xml:space="preserve">
+    <value>Опубликовать</value>
+  </data>
+  <data name="resCantCreateScreen" xml:space="preserve">
+    <value>Не удалось сохранить скриншот программы</value>
+  </data>
+  <data name="resfmtPostPublishedSuccessfully" xml:space="preserve">
+    <value>Запись успешно опубликована в группе "{0}".</value>
+  </data>
+  <data name="resCantPublicatePost" xml:space="preserve">
+    <value>Не удалось опубликовать сообщение</value>
+  </data>
 </root>
